@@ -1,0 +1,141 @@
+TODO: Highlite keywords in color and underline
+
+\beginlecture{01}{09.04.23}\section{Overview and Motivation}
+
+\subsection{Function approximation / Interpolation}
+
+Consider $x_i\in\R^d,\hat{f}_i\in\R$:
+\[\{(x_i,\hat{f}_i)\}_{i=1}^N.\]
+
+Aim: Find a ``good''  function $f$ such that\marginnote{Lagrangian Interpolation does not work great for a lot of points and higher dimensions} 
+\[f(x_i)=\hat{f}_i,\text{  } i=1,\dots,N\]
+
+Application: Geophysics data, estimate unknown soil properties
+
+To compute $f$, we can make use of a discrete representation of $f$ using \textbf{ansatzfunctions}
+$\{b_j\}_{j=1}^N$:
+\[f(x)=\sum_{j=1}^N c_j b_j(x).\]
+
+Here we assume the same number of data and functions $b_j$.
+
+For interpolation, we can solve this via:
+\[BC=\hat{F}\]
+
+\textbf{Kernel functions} that are centered at the locations $x_j$ turn out to be a good choice:
+\[b_j(x)=k(x_j,x)\]
+which gives
+\[f(x)=\sum_{j=1}^N c_j k(x_j,x).\]
+
+We will also consider approximation instead of interpolation
+\[f(x_i)\approx \hat{f}_i.\]
+This is in particular relevant in machine learning, 
+where one usually assumes, 
+and actually has noise and measurement errors in the given data.
+
+Example: Asses credit risk\marginnote{Careful not to discriminate, credit risk should be independent of neighbourhood for example!}
+
+Example: Chemistry / energy of molecules. This needs a kernel on graphs
+
+Example: Time series. This needs a kernel on time series
+
+\begin{remark}
+    We will also see that kernels relate to similarity measures and therefore to distances (dissimilarity).
+\end{remark}
+
+Topics in part 1:
+\begin{itemize}
+    \item What are kernels and their properties
+    \item Reproducing Kernel Hilbert spaces as the function space in which we are working
+    \item Function interpolation and their approximation properties
+    \item Generalized interpolation for solving partial differential equations
+    \item Kernel methods for prediction in machine learning, representer theorem and regularization
+    \item Gaussian Process Regression and Support Vector Machines
+\end{itemize}
+
+\subsection{Dimensionality reduction}
+
+Distances and similarities are a key aspect of the second topic of the course:
+\begin{center}
+    Dimensionality reduction for high-dimensional data
+\end{center}
+
+The key idea is to find a ''good'' low dimensional representation (called embedding),
+such that chosen properties in high dimensions are approximately preserved.
+
+Example: Embedding of german cities bases on car distances (linear)
+
+Example: Embedding of cities based on flight distances (non linear)
+
+Example: Single cell genomics (Seeing structure)
+
+\begin{itemize}
+    \item linear dimensionality reduction (numerical linear algebra)
+    \item \dots
+    \item \dots 
+\end{itemize}
+
+\section{Kernels}
+
+\begin{*definition}[Gaussian kernel]
+    The gaussian kernel is a prime example of a kernel:
+    \[k(x,y)\coloneqq \exp\left(-\alpha\Vert x-y\Vert_2^2\right)=\phi(\Vert x-y\Vert_2)\]
+    where $\alpha$ is a scaling parameter.    
+\end{*definition}
+
+\begin{definition}
+    Let $\Omega$ be an arbitrary nonempty set. 
+    A function $k:\Omega\times \Omega\to\R$ is called kernel on $\Omega$.
+    We call $k$ a symmetric kernel if 
+    \[k(x,y)=k(y,x)\]
+    for all $x,y\in\Omega$.
+\end{definition}
+
+\begin{definition}
+    A function $\Phi:\R^d\to\R$ is said to be radical if there exists a function $\phi:[0,\infty]\to\R$
+    such that 
+    \[\Phi(x)=\phi(\Vert x\Vert_2)\]
+\end{definition}
+
+\begin{example}
+    Inverse multiquadratics (negative $\beta$): 
+    \[\phi(r)=(1+\alpha r^2)^\beta\]
+\end{example}
+\begin{example}
+    multiquadratics (positive $\beta$): 
+    \[\phi(r)=(1+\alpha r^2)^\beta\]
+\end{example}
+\begin{example}[Polyharmonic]
+    \marginnote{not monotone!}
+    \[\phi(r)=r^\beta \log (|r|)\] 
+\end{example}
+\begin{example}[Wendland's kernels]
+    \marginnote{compactly supported}
+\end{example}
+
+\begin{remark}
+    There are also non radial kernels:
+    \[k(x,y)=\Phi(x-y)\]
+    or for periodic setups the dirichlet kernel:
+    or zonal kernels (can be represented by the angle between the inputs):
+\end{remark}
+
+\begin{remark}
+    We wil see that a kernel $k$ on $\Omega$ defines a function $k(x,\cdot)$ for all fixed $x\in\Omega$. The space
+    \[\mathcal{K}_0\coloneqq \text{span}\{k(x,\cdot)\mid x\in\Omega\}\]
+    can for example be used as a so called trial space in meshless methods for solving partial differential equations.
+\end{remark}
+\begin{remark}
+    Kernels can always be restricted to subsets without losing important
+\end{remark}
+\begin{remark}
+    Most of this works for complex kernels too.
+\end{remark}
+
+In machine learning a kernel is often used to describe the similarity of two data (often unstrued)
+
+Feature spaces and kernels \dots
+
+non euclidean origin spaces (bag of words)
+
+pair of graphs 
+mercer kernels

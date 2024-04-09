@@ -103,6 +103,8 @@
 \def\as{\text{ a.s. }}
 \def\cov{\text{Cov}}
 
+\counterwithout*{equation}{equation}
+\renewcommand{\theequation}{\arabic{equation}}
 
 
 \newtheorem{theorem}[algorithm]{Theorem}
@@ -113,7 +115,7 @@
 \newtheorem*{*definition}{Definition}
 \newtheorem*{remark}{Remark}
 \newtheorem*{aremark}{Added remark}
-\newtheorem{example}[algorithm]{Example}
+\newtheorem*{example}{Example}
 \newtheorem*{adefinition}{Added definition}
 \newtheorem*{aexample}{Added example}
 \raggedright
@@ -129,10 +131,8 @@
 
 \titleformat{\chapter}[display]
   {\normalfont\bfseries\flushleft\color{mycolor}}{\Huge\chaptertitlename\ \thechapter:}{0pt}{\Huge}
-\titleformat{\section}[hang]
-  {\color{mycolor}}{}{0pt}{}
-
 \sectionfont{\color{mycolor}}
+\subsectionfont{\color{mycolor}}
 
 
 \renewcommand{\cftchapfont}{\color{mycolor}\large\bfseries}
@@ -146,7 +146,9 @@
 \renewcommand{\cftsubsubsecleader}{\color{mycolor} \cftdotfill{\cftsecdotsep}}
 
 
-\newcommand{\beginlecture}[2]{\noindent\xrfill[0.7ex]{1pt}Start of lecture #1 (#2)\xrfill[0.7ex]{1pt}\newline}
+\newcommand{\beginlecture}[2]{\marginnote{Start of lecture #1 (#2)}}
+\newcommand{\dhighlight}[1]{{\color{mycolor}{\underline{{\textbf{#1}}}}}}
+\newcommand{\highlight}[1]{{\color{mycolor}{\textbf{#1}}}}
 \newcommand{\includeproblem}[2]{
 \begin{tcolorbox}[enhanced,breakable,
 	title=Problem #1,frame style={color=mycolor}]

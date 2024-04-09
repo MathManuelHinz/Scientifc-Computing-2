@@ -1,0 +1,67 @@
+\beginlecture{01}{09.04.23}\section{Overview}
+
+We begin with a quick overview of the two parts of the lecture:
+
+\subsection{Function approximation / Interpolation}
+
+Consider $x_i\in\R^d,\hat{f}_i\in\R$:
+\[\{(x_i,\hat{f}_i)\}_{i=1}^N.\]
+
+Aim: Find a ``good''  function $f$ such that\marginnote{Lagrangian Interpolation does not work great for a lot of points and higher dimensions} 
+\[f(x_i)=\hat{f}_i,\text{  } i=1,\dots,N\]
+
+To compute $f$, we can make use of a discrete representation of $f$ using \highlight{Ansatzfunctions}
+$\{b_j\}_{j=1}^N$:
+\[f(x)=\sum_{j=1}^N c_j b_j(x).\]
+
+Here we assume the same number of data and functions $b_j$.
+
+For interpolation, we can solve this via:
+\[BC=\hat{F}\]
+
+\highlight{Kernel functions} that are centered at the locations $x_j$ turn out to be a good choice:
+\[b_j(x)=k(x_j,x)\]
+which gives
+\[f(x)=\sum_{j=1}^N c_j k(x_j,x).\]
+
+We will also consider approximation instead of interpolation
+\[f(x_i)\approx \hat{f}_i.\]
+This is in particular relevant in machine learning, 
+where one usually assumes, 
+and actually has noise and measurement errors in the given data.
+
+Example: Asses credit risk\marginnote{Careful not to discriminate, credit risk should be independent of neighbourhood for example!}
+
+Example: Chemistry / energy of molecules. This needs a kernel on graphs
+
+Example: Time series. This needs a kernel on time series
+
+\begin{remark}
+    We will also see that kernels relate to similarity measures and therefore to distances (dissimilarity).
+\end{remark}
+
+\dhighlight{Topics in part 1:}
+\begin{itemize}
+    \item What are kernels and their properties
+    \item Reproducing Kernel Hilbert spaces as the function space in which we are working
+    \item Function interpolation and their approximation properties
+    \item Generalized interpolation for solving partial differential equations
+    \item Kernel methods for prediction in machine learning, representer theorem and regularization
+    \item Gaussian Process Regression and Support Vector Machines
+\end{itemize}
+
+\subsection{Dimensionality reduction}
+
+Distances and similarities are a key aspect of the second topic of the course:
+\begin{center}
+    Dimensionality reduction for high-dimensional data
+\end{center}
+
+The key idea is to find a ``good'' low dimensional representation (called embedding),
+such that chosen properties in high dimensions are approximately preserved.
+
+\begin{itemize}
+    \item Linear dimensionality reduction (numerical linear algebra)
+    \item Nonlinear dimensionality reduction (numerical linear algebra with Non-euclidean geometry)
+    \item Dimensionality reduction with neural networks and other nonlinear function representations 
+\end{itemize}

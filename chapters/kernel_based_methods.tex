@@ -1,0 +1,173 @@
+\section{Kernels}
+
+\begin{*definition}[Gaussian kernel]
+    The \highlight{gaussian kernel} is a prime example of a kernel:
+    \[k(x,y)\coloneqq \exp\left(-\alpha\Vert x-y\Vert_2^2\right)=\phi(\Vert x-y\Vert_2)\]
+    for all $x,y\in\R^d$ where $\alpha$ is a scaling parameter.    
+\end{*definition}
+
+\begin{definition}
+    Let $\Omega$ be an arbitrary nonempty set. 
+    A function $k:\Omega\times \Omega\to\R$ is called \dhighlight{kernel} on $\Omega$.
+    We call $k$ a \dhighlight{symmetric kernel} if 
+    \[k(x,y)=k(y,x)\]
+    for all $x,y\in\Omega$.
+\end{definition}
+
+\begin{definition}
+    A function $\Phi:\R^d\to\R$ is said to be \dhighlight{radial} if there exists a function $\phi:[0,\infty]\to\R$
+    such that 
+    \[\Phi(x)=\phi(\Vert x\Vert_2)\]
+    for all $x\in\R^d$. Such a function is traditionally called a \dhighlight{radial basis function (rbf)}.
+\end{definition}
+
+\subsection{Examples}
+
+\begin{example}[(Inverse) multiquadratics]
+    \highlight{Multiquadratics} are of the form 
+    \[\phi(r)=(1+\alpha r^2)^\beta\]
+    for positive $\beta$, while \highlight{inverse multiquadratics}
+    have a $\beta<0$.
+\end{example}
+\begin{example}[Polyharmonic kernels]
+    \highlight{Polyharmonic kernels}
+    \marginnote{While the previous examples were monotone kernels
+        (as a function of $r$), these are not!}
+    are of the form
+    \[\phi(r)=r^\beta \log (|r|)\]
+    where $\beta\in2\Z$.
+    
+    The special case $\beta=2$ is the so-called \highlight{thin-plate spline}.
+    It relates to the partial differential equation that describes the bending of thin plates.
+\end{example}
+\begin{example}[Wendland's kernels]
+   \highlight{Wendland's kernels} are of the form 
+   \[\phi_{a,1}\coloneqq (1-r)_+^{(a+1)}(1+(a+1)r)\]
+   with the \highlight{cut-off function}
+   \[(x)_+\coloneqq \begin{cases}
+    x & x\geq 0\\
+    0 & x <0
+   \end{cases}\] 
+\end{example}
+
+\begin{remark}
+    There are also non radial kernels:
+    
+    \highlight{Translation-invariant} or \highlight{stationary} 
+    kernels are functions of differences:
+    \[k(x,y)=\Phi(x-y).\]
+    For periodic setups, we have the \highlight{Dirichlet kernel} as an example:
+    \[D(\phi)\coloneqq \frac{1}{2}+\sum_{j=1}^N\cos(j\varphi)=\frac{\sin\left(\left(n+\frac{1}{2}\right)\phi\right)}{2\sin\left(\frac{\phi}{2}\right)}.\]
+    This is applied to differences $\phi=\alpha-\beta$ of angles or $2\pi$-periodic arguments and is an important tool for Fourier series theory.
+
+    There are so called \highlight{zonal kernels}, for working on a sphere, where the kernel 
+    can be represented as a function of an angle. An example are functions of inner products, such as 
+    \[k(x,y)=\exp(x^\intercal y).\]
+    Remember, $x^\intercal y$ is the (scaled) cosine of the angle between the two vectors.
+\end{remark}
+
+\begin{remark}
+    We wil see that a kernel $k$ on $\Omega$ defines a function $k(x,\cdot)$ for all fixed $x\in\Omega$. The space
+    \[\mathcal{K}_0\coloneqq \text{span}\{k(x,\cdot)\mid x\in\Omega\}\]
+    can for example be used as a so called trial space in meshless methods for solving partial differential equations.
+\end{remark}
+\begin{remark}
+    Kernels can always be restricted to subsets without losing essential properties.
+    This easily allows kernels on embedded manifolds, e.g. the sphere.
+\end{remark}
+\begin{remark}
+    Most of this works for complex kernels too.
+\end{remark}
+
+\subsection{Kernels in machine learning}
+
+In machine learning the data $x\in\Omega$ can be quite diverse and without (much)
+structure on first glance. For example consider images, text documents, customers, graphs, \dots
+
+Here, one views the kernel as a \highlight{similarity measure}\marginnote{In $\R^d$, we can work with the standard scalar product}, i.e.
+\[k:\Omega\times \Omega\to\R\]
+return a number $k(x,y)$ describing the similarity of two patterns $x$ and $y$.
+
+To work with general data, 
+we first need to represent it in a Hilbert space
+\marginnote{Reminder: A Hilbert space is a complete vector space 
+    with a scalar product}
+$\cF$, the so-called \highlight{feature space}. 
+One considers the (application dependent) \highlight{feature map}
+\[\Phi:\Omega\to\cF.\]
+The map describes each $x\in\Omega$ by a collection of \highlight{features} which are 
+characteristic for a $x$ and capture the essentials of elements of $\Omega$. 
+Since we are now in $\cF$ we can work with linear techniques. In particular we can use 
+the scalar product in $\cF$ of two elements of $\Omega$ represented by their features:
+\[\langle\Phi(x),\Phi(y) \rangle_{\cF}\eqqcolon k(x,y)\]
+and define a kernel that way.
+
+\begin{remark}
+    Given a kernel, neither the feature map nor the feature space are unique, as the following example shows:
+\end{remark}
+\begin{example}\marginnote{Such a construction can be made for any arbitrary kernel, therefore every kernel has many different feature spaces}
+    Let $\Omega=\R,k(x,y)=x\cdot y$. A feature map, with feature space $\cF=\R$ is given by the identity map.
+
+    But,the map $\Phi:\Omega\to\R^2$ defined by 
+    \[\Phi(x)\coloneqq (x/\sqrt{2},x/\sqrt{2})\]
+    is also a feature map given the same $k$! 
+\end{example}
+The following two examples show how one can handle non-euclidean origin spaces:
+\begin{example}[Kernels on a set of documents]
+    Consider a collection of documents. 
+    We represent each document as a \highlight{bag of words}
+    \marginnote{that is a set of frequencies of (chosen) words}
+    and describe a bag as a vector in a space in which each dimension is associated
+    with a term from the set of words, i.e. the dictionary. The feature map is 
+    \[\Phi(t)\coloneqq(\text{wf}(w_1,t),\text{wf}(w_2,t),\dots,\text{wf}(w_d,t))\in\R^d\]
+    where $\text{wf}(w_i,t)$ is the frequency of word $w_i$ in document $t$.
+    
+    A simple kernel is the vector space kernel
+    \[k(t_1,t_2)=\langle \Phi(t_1),\Phi(t_2)\rangle=\sum_{j=1}^d \text{wf}(w_j,t_1)\text{wf}(w_j,t_2).\]
+
+    Natural extensions to this kernel take e.g. word order, relevance or semantics into account,
+    which can be achieved by using matrices in the scalar product:
+    \[k(t_1,t_2)=\langle S\Phi(t_1),S\Phi(t_2)\rangle=\Phi^\intercal(t_1)S^\intercal S\Phi(t_2.)\]
+\end{example}
+\begin{example}[Graph kernels]
+    Another non-euclidean data object are graphs, 
+    where the class of \highlight{random walk kernels}
+    can be defined. These are based on the idea that given a pair of graphs,
+    one performs random walks on both and counts the number of matching walks.
+    With $\tilde{A}_\times$ the adjacency matrix of the \highlight{direct product graph} of the two 
+    involved graphs, one defines:
+    \[k(G,H)\coloneqq\sum_{j=1}^{N_G}\sum_{k=1}^{N_H}\sum_{l=1}^\infty\lambda_l[\tilde{A}^l_\times]_{j,k}.\]
+    More generally, one can define a \highlight{random walk graph kernel} $k$ as 
+    \[k(G,H)\coloneqq \sum_{k=0}^\infty \lambda_k q_{\times}^T W^k_{\times}p_\times,\]
+    where $W_\times$ is the \highlight{weight matrix} of the direct product graph, 
+    $q_\times^T$ is the \highlight{stopping probability} on the direct product graph, 
+    and $p_\times$ is the initial product distribution on the direct product graph.
+\end{example}
+
+\subsection{Mercer kernels}
+
+More generally, one can consider kernels of the \highlight{Hilbert-Schmidt} or \highlight{Mercer} form 
+\[k(x,y)=\sum_{i\in I}\lambda_i\varphi_i(x)\varphi_i(y),\]
+with certain functions $\varphi_i:\Omega\to\R$, certain positive \highlight{weights} $\lambda_i$ and an 
+index set $I$ such that the following \highlight{summability condition} holds for all $x\in\Omega$:
+\begin{equation}
+    k(x,y)=\sum_{i\in I}\lambda_i\varphi_i(x)^2<\infty
+\end{equation}
+
+\begin{remark}
+    Such kernels arise in machine learning if the functions $\varphi_i$ each describe a feature of $x$ and the 
+    feature space is the weighted $l_2$-space of sequences with indices in $I$:
+    \[l_{2,I,\lambda}\coloneqq\left\{\{\xi_i\}_{i\in I}:\sum_{i\in I}\lambda_i\xi_i^2 <\infty\right\}.\]
+\end{remark}
+
+This expansion also occurs when kernels generating positive operators are expanded into eigenfunctions on $\Omega$. Such kernels can 
+be views as arising from generalized convolutions.
+
+Generally kernels have three major application fields:
+\begin{itemize}
+    \item Convolutions 
+    \item Trial spaces
+    \item Covariances
+\end{itemize}
+
+We are mainly concerned with the last two.
