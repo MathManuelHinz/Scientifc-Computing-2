@@ -6,7 +6,7 @@
     for all $x,y\in\R^d$ where $\alpha$ is a scaling parameter.    
 \end{*definition}
 
-\begin{definition}
+\begin{definition}\label{def:1.1}
     Let $\Omega$ be an arbitrary nonempty set. 
     A function $k:\Omega\times \Omega\to\R$ is called \dhighlight{kernel} on $\Omega$.
     We call $k$ a \dhighlight{symmetric kernel} if 
@@ -14,7 +14,7 @@
     for all $x,y\in\Omega$.
 \end{definition}
 
-\begin{definition}
+\begin{definition}\label{def:1.2}
     A function $\Phi:\R^d\to\R$ is said to be \dhighlight{radial} if there exists a function $\phi:[0,\infty]\to\R$
     such that 
     \[\Phi(x)=\phi(\Vert x\Vert_2)\]
@@ -171,3 +171,173 @@ Generally kernels have three major application fields:
 \end{itemize}
 
 We are mainly concerned with the last two.
+
+\beginlecture{02}{11.04.23}
+
+\subsection{Properties of kernels}
+Consider an arbitrary set $X=\{x_1,\dots,x_N\}$\marginnote{$N$ is the number of data points (always!)} 
+of $N$ \highlight{distinct} elements of $\Omega$ 
+and a symmetric Kernel $K$ on $\Omega\times \Omega$.
+\[f(x)=\sum_{j=1}^N a_j k(x_j,x),x\in\Omega\]
+\begin{remark}
+    The set of $k(x_j,\cdot)$ might not be linear independent!
+\end{remark}
+
+For $X$ we construct the symmetric $N\times N$ Kernel matrix
+\[K=K_{X,X}=(k(x_j,x_k))_{{1\leq j,k\leq N}}\]
+and obtain the interpolation problem 
+\[\hat{f}_k=f(x_k)=\sum_{j=1}^N a_j k(x_j,x_k)\]
+in matrix form 
+\[K_{X,X}a=\hat{F}\]
+
+\begin{remark}
+    With kernels, we will see that this is indeed solvable, because our matrix is symmetric and positive definite.
+\end{remark}
+
+\begin{definition}\label{def:1.3}
+    A Kernel on $\Omega\times \Omega$ is 
+    \dhighlight{symmetric and positive semidefinite}
+    \marginnote{semidefinite and definite have conflicting definitions 
+    in the literature!},
+    if all Kernel matrices for all finite sets of distinct elements of 
+    $\Omega$ are symmetric and positive definite
+\end{definition}
+
+\begin{theorem}\label{thm:1.4}
+    \begin{enumerate}
+        \item Kernels arising from \highlight{feature maps} via \[k(x,y)=\langle\Phi(x),\Phi(y)\rangle\] are positive semidefinite.
+        \item \highlight{Hilbert-Schmidt} or \highlight{Mercer Kernels} \[k(x,y)=\sum_{i\in I}\varphi_i(x)\varphi_i(y)\] are positive semidefinite.
+    \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+    \begin{enumerate}
+        \item $K$ is a \highlight{Gram(-ian)} matrix\marginnote{A Gram matrix, is a matrix whose entries are given by inner products $K_{i,j}=\langle v_i,v_j\rangle$}
+        \item \begin{align*}
+            a^\intercal K a&=\sum_{j,k=1}^N a_ja_k k(x_j,x_k)=\sum_{j,k=1}^Na_ja_k\sum_{i\in I}\varphi_i(x)\varphi_i(y)\\
+            &=\sum_{i\in I}\lambda_i\sum_{j=1}^N a_j\varphi_i(x_j)\sum_{k=1}^N a_k\varphi_i(x_k)=\sum_{i\in I}\lambda_i\left(\sum_{j=1}^N a_j\phi_i(x_j)\right)^2\geq 0
+        \end{align*}
+    \end{enumerate}
+\end{proof}
+
+\begin{theorem}\label{thm:1.5}
+    Let $K$ be a symmetric positive semidefinite (spsd) Kernel on $\Omega$. Then  
+    \begin{enumerate}
+        \item $k(x,x)\geq 0$ for all $x\in \Omega$
+        \item\label{thm:1.5_item2} $\vert k(x,y)\vert^2\leq k(x,x)k(y,y)$ for all $x,y\in\Omega$
+        \item $2\vert k(x,y)\vert^2\leq k(x,x)^2+k(y,y)^2$ for all $x,y\in\Omega$
+        \item Any finite linear combination spsd Kernels with nonnegative coefficients gives a spsd Kernel. If any of these kernels is positive definite, and its coefficient is positive, then the combination of kernels is positive definite.
+        \item The product of two spsd kernels is spsd.
+        \item The product of two spd kernels is spd.
+    \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+    \underline{1.:} Use the set $\{x\}$ in Definition \ref{def:1.3}.\\
+    \underline{2.:} Consider $K$ of $\{x,y\}$. 
+    The determinant of such a positve semidefinite matrix is nonnegative,
+    therefore \[k(x,x)k(y,y)-k(x,y)^2\geq 0\]
+    \underline{3.:} $2ab\leq a^2+b^2$ for all $a,b\in\R_0^+$. Therefore this follows from \ref{thm:1.5_item2}.\\
+    \underline{4.:} Expand $a^\intercal K a$ to see this.\\
+    \underline{5.:} Follows from Lemma \ref{lemma:1.6}.\\
+    \underline{6.:} Follows from Lemma \ref{lemma:1.6} and a bit more linear algebra.
+\end{proof}
+
+\begin{lemma}[Schur's Lemma]\label{lemma:1.6}
+    For two matrices $A,B$, the matrix $C$ with elements 
+    \[C_{jk}=A_{jk}B_{jk}\]
+    is called the \dhighlight{Schur product} or \dhighlight{Hardarmard product}. The Schur product of two 
+    psd matrices is psd.
+\end{lemma}
+
+\begin{proof}
+    Decompose $A=S^\intercal DS$ with $S$ an 
+    orthogonal matrix and $D=\text{diag}(\lambda_1,\dots,\lambda_n)$ 
+    a diagonal matrix with $\lambda_i\geq 0$ the eigenvalues of $A$.
+
+    For all $q\in\R^N$ we look at 
+    \begin{align*}
+        q^\intercal Cq&=\sum_{j,k}q_jq_ka_{jk}b_{jk}=\sum_{j,k=1}^N q_j q_k\sum_{m=1}^N\lambda_m S_{jm}S_{km}\\
+        &=\sum_{m=1}^N \lambda_m \sum_{j,k=1}^N \underbrace{q_j S_{jm}}_{P_{k,m}} \underbrace{q_k S_{km}}_{P_{km}} b_{jk}=\sum_{m=1}^N\sum_{j,k=1}^N\underbrace{P_{jm}P_{km}b_{jk}}_{\geq 0\text{ since } B \text{ is psd}}\geq 0
+    \end{align*}
+\end{proof}
+
+\begin{remark}
+    Note that we only considered symmetric matrices, the above also holds if one of the matrices is not symmetric, but positive definite instead. %TODO: Klären, brauchen wir jetzt symmetric oder nicht?
+\end{remark}
+
+\begin{remark}%TODO Link to the definition of RKHS
+    Our overall aim is to go from kernels to a \highlight{reproducing kernel Hilbert space (RKHS)}. Therefore 
+    we define candidate spaces and a bilinear form in a way we would expec them.
+\end{remark}
+
+\begin{*definition}
+    For spsd $K$ we define 
+    \[H\coloneqq\text{span}\{k(x,\cdot)\mid x\in\Omega\}.\]
+    In the same way
+    \[L\coloneqq \text{span}\{\delta_x\mid x\in\Omega,\delta_x:H\to\R\}\]
+    the linear space of all finite linear combinations of pointevaluation functionals\marginnote{It is important that elements of $L$ act on elements of $H$! These two spaces are paired in some sense.} actions on functions of $H$, where \[\delta_x(f)=f(x).\]
+\end{*definition}
+
+We can, by definition, write all Elements from $L$ and $H$ as 
+\[\lambda_{a,X}\coloneqq \sum_{j=1}^Na_j\delta_{x_j}\]
+\[f_{a,X}\coloneqq \sum_{j=1}^Na_j k(x_j,x)=\lambda_{a,X}^{(y)}k(x,y)\]
+with $a\in\R^n,X=\{x_1,\dots,x_N\}\subset\Omega$ any arbitrary finite subset of $\Omega$.
+
+\begin{remark}
+    From $f_{a,X}=0$ or $\lambda_{a,X}=0$ it does not follow that $a=0$!\marginnote{There might be different representations of elements in $L,H$. While the representation is not unique, the element is}
+\end{remark}
+
+We now define a bilinear form on $L$
+\[\langle \lambda_{a,X},\lambda_{b,Y}\rangle_L\coloneqq \sum_{j=1}^M\sum_{k=1}^N a_j b_k k(x_j,x_k)=\lambda_{a,X}^{(x)}\lambda_{b,Y}^{(y)} k(x,y)=\lambda_{a,X}(f_b,Y)\]
+
+\begin{aremark}
+    One has to be a bit careful here: $\lambda_{a,X}^{(x)}\lambda_{b,Y}^{(y)} k(x,y)$ does not mean point wise multiplication, but concatenation:
+    \[\lambda_{a,X}^{(x)}\lambda_{b,Y}^{(y)} k(x,y)=\lambda_{a,X}^{(x)}(\lambda_{b,Y}^{(y)} k(x,y))\]
+\end{aremark}
+
+This is well-defined, 
+since it is based on the actions of the functional 
+and not the specific representation.
+
+We can observe that  the bilinear form is psd, since the kernel matrices have this property.
+\begin{align*}
+    \left\vert \lambda_{a,X}(f_{b,Y}) \right\vert=\vert \langle \lambda_{a,X},\lambda_{b,Y}\rangle_L\vert\leq \Vert \lambda_{a,X}\Vert_L \Vert \lambda_{b,Y}\Vert_L \text{ }(\star)
+\end{align*}
+
+\begin{theorem}\label{thm:1.7}
+    If $K$ is spsd Kernel on $\Omega$, 
+    the bilinear form $\langle\cdot,\cdot\rangle_L$ 
+    is positive definite in the space $L$ of functionals 
+    defined on $H$. This $L$ is a pre-Hilbert-space.
+
+\end{theorem}
+
+\begin{proof}
+$0=\langle \lambda_{a,X},\lambda_{a,X}\rangle_L$ for $a\in\R^n,X=\{x_1,\dots,x_N\}\subset \Omega$.
+
+Then by $(\star)$ we have $\lambda_{a,X}=0$ as a functional on $H$\marginnote{Here we use that the functionals in $L$ are restricted to functions in $H$}. 
+\end{proof}
+
+\begin{theorem}\label{thm:1.8}
+    The mapping $R:\lambda_{a,X}\mapsto f_{a,X}=\lambda_{a,X}(k(\cdot,y))$ is linear and bijective from $L$ onto $H$. Thus 
+    \[\langle f_{a,X},f_{b,Y}\rangle_H\coloneqq \langle \lambda_{a,X},\lambda_{b,Y}\rangle_L=\langle R(\lambda_{a,X},R(\lambda_{b,Y})\rangle_H\]
+    is an inner product on $H$. $R$ acts as the Riesz map. 
+\end{theorem}
+
+\begin{proof}
+    Linearity is obvious. If $f_{b,Y}=R(\lambda_{b,Y})\in H$ vanishes, the definition of 
+    $\langle\cdot,\cdot\rangle_L$ implies that $\lambda_{b,Y}$ is orthogonal to all of $L$. Due to Theorem \ref{thm:1.7} it is zero.
+    The Riesz property comes from the definition of $\langle\cdot,\cdot\rangle_L$:
+    \[\lambda_{a,X}(f_{b,Y})=\langle \lambda_{a,X},\lambda_{b,Y}\rangle_L=\langle f_{a,X},f_{b,Y}\rangle_H=\langle R(\lambda_{a,X}),f_{b,Y}\rangle\]
+\end{proof}
+
+Specializing to $\lambda_{1,x}$, i.e. to a point $x\in \Omega$, we get:
+\begin{align*}
+    \langle \lambda_{1,x},\lambda_{b,Y}\rangle_L&=\lambda_{1,x}(f_{b,Y})=\delta_x(f_{b,Y})=f_{b,Y}(x)\\
+    =\langle R(\lambda_{1,x}),R(\lambda_{b,Y})\rangle_H&=\langle R(\lambda_{1,x}),f_{b,Y}\rangle_H=\langle k(x,\cdot),f_{b,Y}\rangle_H
+\end{align*}
+
+In other words, for all $f\in H$, $x\in \Omega$, we have 
+\[f(x)=\underline{\delta_x(f)}=\langle f, R(\delta_x)\rangle_H=\underline{\langle f,k(x,\cdot)\rangle_H}\]
+which is the so-called \dhighlight{reproduction equation} for values of functions from the inner product.
