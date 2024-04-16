@@ -172,7 +172,7 @@ Generally kernels have three major application fields:
 
 We are mainly concerned with the last two.
 
-\beginlecture{02}{11.04.23}
+\beginlecture{02}{11.04.24}
 
 \subsection{Properties of kernels}
 Consider an arbitrary set $X=\{x_1,\dots,x_N\}$\marginnote{$N$ is the number of data points (always!)} 
@@ -321,7 +321,7 @@ Then by $(\star)$ we have $\lambda_{a,X}=0$ as a functional on $H$\marginnote{He
 
 \begin{theorem}\label{thm:1.8}
     The mapping $R:\lambda_{a,X}\mapsto f_{a,X}=\lambda_{a,X}(k(\cdot,y))$ is linear and bijective from $L$ onto $H$. Thus 
-    \[\langle f_{a,X},f_{b,Y}\rangle_H\coloneqq \langle \lambda_{a,X},\lambda_{b,Y}\rangle_L=\langle R(\lambda_{a,X},R(\lambda_{b,Y})\rangle_H\]
+    \[\langle f_{a,X},f_{b,Y}\rangle_H\coloneqq \langle \lambda_{a,X},\lambda_{b,Y}\rangle_L=\langle R(\lambda_{a,X}),R(\lambda_{b,Y})\rangle_H\]
     is an inner product on $H$. $R$ acts as the Riesz map. 
 \end{theorem}
 
@@ -341,3 +341,142 @@ Specializing to $\lambda_{1,x}$, i.e. to a point $x\in \Omega$, we get:
 In other words, for all $f\in H$, $x\in \Omega$, we have 
 \[f(x)=\underline{\delta_x(f)}=\langle f, R(\delta_x)\rangle_H=\underline{\langle f,k(x,\cdot)\rangle_H}\]
 which is the so-called \dhighlight{reproduction equation} for values of functions from the inner product.
+
+\beginlecture{03}{16.04.24}
+
+\begin{aremark}
+    In this lecture $(\star)$ refers to the reproduction equation.
+\end{aremark}
+
+For $f=k(\cdot,y)$, we set $k(x,y)=\langle k(x,\cdot),k(y,\cdot)\rangle_H$.
+We furthermore can observe $\forall f\in H,x\in\Omega$:
+\[\vert \delta_x(f)\vert=\vert f(x)\vert=\vert \langle f,k(x,\cdot)\rangle_H\vert\leq \Vert f\Vert_H\Vert k(x,\cdot)\Vert_H=\Vert f\Vert_H \sqrt{K(x,x)}\]
+and 
+\[\langle \delta_x,\delta_y\rangle_L=\langle k(x,\cdot),k(y,\cdot)\rangle_H=k(x,y)\forall x,y\in \Omega\]
+\begin{align*}
+    \Vert \delta_x-\delta_y\Vert_L^2=\Vert \delta_x\Vert_L^2-2\langle \delta_x,\delta_y\rangle+\Vert \delta_y\Vert_L^2=k(x,x)-2\langle k(x,\cdot),k(y,\cdot)\rangle_H+k(y,y)
+\end{align*}
+is a \highlight{distance} on $\Omega$:
+\[\text{dist}(x,y)\coloneqq \Vert \delta_x-\delta_y\Vert_L=\sqrt{k(x,x)-2\langle k(x,\cdot),k(y,\cdot)\rangle_H+k(y,y)}.\]
+
+We see that for all $x,y\in\Omega$
+\[\vert f(x)f(y)\vert\leq \Vert f\Vert_H\Vert\delta_x-\delta_y\Vert_L=\Vert f\Vert_H\text{dist}(x,y)\]
+and therefore all functions in $H$ are continuous with respect to this distance.
+
+\begin{theorem}\label{thm:1.9}
+    Each symmetric positive definite kernel $k$ on a set $\Omega$ is the \dhighlight{reproducing kernel} of 
+    a Hilbert space called the \dhighlight{native space} $\cH=\mathcal{N}_k$\marginnote{$\cH$ can be constructed as the closure of $H$} of the kernel.
+    This Hilbert space is unique and it is a space of functions on $\Omega$. The kernel $k$ fulfills
+    \begin{equation}\label{eq:002}
+        \langle f,k(x,\cdot)\rangle_{\cH}=f(x)
+    \end{equation}
+\end{theorem}
+
+\begin{proof}
+    Citation: The existence of native spaces follows from standard Hilbert space arguments, see e.g. chapter 11 from the lecture notes of Schaback. 
+\end{proof}
+
+\begin{aremark}
+    The good ideas are from Schaback, the errors are from me, Prof. Garcke\marginnote{The erros in this script are largely due to me :)}
+\end{aremark}
+
+Proof of uniqueness:
+
+If $k$ is a reproducing kernel in a different Hilbert space $T$, we observe
+\begin{align*}
+    \langle k(x,\cdot),k(y,\cdot)\rangle_{\cH}=k(x,y)=\langle k(x,\cdot),k(y,\cdot)\rangle_T
+\end{align*}
+which shows that the inner products coincide on $H$.
+Since $T$ is a Hilbert space, it must contain the closure $\mathcal{N}_k$ of $H$ as a closed subspace. 
+For $T$ to be larger than $\cH$ non-zero element $f\in T$ must exist that is orthogonal to $\cN_k$ and in particular 
+to $H$. We observe 
+\begin{align*}
+    f(x)=\langle f,k(x,\cdot) \rangle_T=0\hspace{2cm}\forall x\in\Omega.
+\end{align*}
+which is a contradiction to $f\neq 0$, because of ($\ref{eq:002}$) for $T$.
+
+Dual spaces:
+
+$\delta_x:\cN_k\to\R,f\mapsto f(x)$ for all $f\in\cN_k,x\in\Omega$.
+
+The dual space $\cN_k^*$ of $\cN_k$ is again a Hilbert space.
+\begin{align*}
+    R:&\cN_k^*\to\cN_k\\
+    \lambda(f)=&\langle f,R(\lambda)\rangle_{\cN_k}\forall f\in \cN_k \lambda\in \cN_k^*\\
+    \langle \lambda,\mu\rangle_{\cN_k^*}&=\langle R(\lambda),R(\mu)\rangle_{\cN_k}\forall \lambda,\mu\in \cN_k^*
+\end{align*}
+Also via the reproducing equation $\ref{eq:002}$
+\[\delta_x(f)=\langle f,k(x,\cdot)\rangle_{\cN_k}\forall f\in\cN_k,x\in\Omega.\]
+So $k(x,\cdot)$ is the \highlight{Riesz representer} $R(\delta_x)$ of $\delta_x$ 
+\begin{align*}
+    \langle \delta_x,\delta_y\rangle_{\cN_k^*}=\langle R(\delta_x),R(\delta_y)\rangle_{\cN_k}=k(x,y)\hspace{2cm}&\forall x,y\in\Omega  \\
+    \Vert\delta_x\Vert_{\cN_k^*}=\Vert k(x,\cdot)\Vert_{\cN_k}=\sqrt{k(x,x)}\hspace{2cm}&\forall x\in\Omega\\
+    \lambda(f)=\langle f,\lambda^*k(x,\cdot)\rangle_{\cN_k}\hspace{2cm}&\forall f\in\cN_k,\lambda\in \cN_k^*
+\end{align*}
+so that $\lambda^* k(x,\cdot)$ is the Riesz representer of $\lambda$.
+
+\section{Reproducing Kernel Hilbert Space (RKHS)}
+
+\begin{definition}\label{def:RKHS}
+    A Hilbert space $\cH$ of functions on a set $\Omega$ with an inner product 
+    $\langle\cdot,\cdot\rangle_{\cH}$ is called \dhighlight{RKHS} if there is a kernel
+    function $k:\Omega\times\Omega\to\R$ with $k(x,\cdot)\in\cH$ forall $x\in\Omega$ and 
+    the reproducing kernel property 
+    \[f(x)=\langle f,k(x,\cdot)\rangle_{\cH}\hspace{3cm}\forall x\in\Omega,f\in\cH\]
+\end{definition}
+
+This directly implies 
+\begin{align*}
+    k(y,x)=\langle k(y,\cdot),k(x,\cdot)\rangle_\cH=\langle k(x,\cdot),k(y,\cdot)\rangle_\cH=k(x,y).
+\end{align*}
+
+For positive semi-definiteness one can use a Gram matrix argument or 
+
+take any $X=\{x_1,\dots,x_N\}\subset\Omega$ and $a\in\R^n$
+\begin{align*}
+    \sum_{j,k=1}^N a_j a_k k(x_j,x_k)&=\sum_{j,k=1}^N a_ja_k\langle k(x,\cdot),k(y,\cdot)\rangle_\cH\\
+    &=\langle \sum_{j=1}^N a_jk(x_j,\cdot),\sum_{k=1}^N a_k k(x_k,\cdot)\rangle_\cH  \\
+    &=\Vert \sum_{j=1}^N a_j k(x,\cdot)\Vert_\cH^2\geq 0
+\end{align*}
+
+\begin{theorem}\label{thm:1.11}
+    Each Hilbert space $\cH$ of real valued functions on some set $\Omega$ with point evaluation functionals 
+    \[\delta_x:f\mapsto f(x)\hspace{3cm}\forall f\in\cH\]
+    is a  RKHS with a unique positive definite kernel $k$ on $\Omega$. The kernel is 
+    uniquely defined by providing the Riesz representers of the (continuous) point evaluation functionals. The space $\cH$ is the 
+    native space of the kernel.
+\end{theorem}
+
+\begin{proof}
+    Under the given hypothesis, there must be a Riesz representer of $\delta_x$. By the definition of th Riesz map 
+    it takes the form $k(x,\cdot)\in\cH$ satisfying the reproduction equation \ref{eq:002}.
+    
+    In other words, any such Hilbert space has a symmetric positive definite kernel.
+
+    The final statement follows from theorem \ref{thm:1.9}, because the native space and $\cH$ are Hilbert spaces 
+    that contain all $k(x,y)$.
+\end{proof}
+
+\begin{theorem}\label{thm:1.12}
+    If a Hilbert (sub-)space of functions on $\Omega$ has a finite orthogonal basis
+    $v_1,\dots,v_N$ the reproducing kernel is 
+    \[k_N(x,\cdot)\sum_{j=1}^N v_j(x)v_j(\cdot)\hspace{1cm} \forall x\in\Omega\]
+    In case of a subspace we have \marginnote{Which in some sense means that larger dimensions of the subspace can't add too much to the norm}
+    \[\sum_{j=1}^N \vert v_j(x)\vert^2=k_N(x,x)\leq k(x,x)\hspace{1cm}\forall x\in\Omega\] 
+\end{theorem}
+
+\begin{proof}
+    The kernel must have a representation in the ONB 
+    \[k_N(x,\cdot)=\sum_{j=1}^N\langle k_N(x,\cdot),v_j\rangle_\cH v_j(\cdot)\stackrel{(\ref{eq:002})}{=}\sum_{j=1}^N v_j(x)v_j(\cdot)\]    
+    For the subspace, % Weil pont eval
+    \begin{align*}
+        k_N(x,x)&=\langle k_N(x,\cdot),k_N(x,\cdot)\rangle_\cH&\\
+        &\stackrel{\text{Hilbert subspace}}{=}\langle k_N(x,\cdot),k(x,\cdot)\rangle_{\cH}&\\
+        &\leq\sqrt{k_N(x,x)}\sqrt{K(x,x)}&\forall x\in\Omega
+    \end{align*}
+\end{proof}
+
+% TODO: THM 7/8 warum surjektiv
+\begin{aremark}
+    The subspace property does not hold for arbitrary Hilbert spaces, this tells us that a RKHS is really not the same as a normal Hilbert space!
+\end{aremark}
