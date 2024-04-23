@@ -62,8 +62,14 @@
 \chapter{Manuel's notes and introduction}
 \input{warning}
 \input{general_information}
-\printlecture % https://tex.stackexchange.com/questions/231055/how-can-i-create-a-list-as-a-variable-that-can-be-appended-and-eventually-typese
 \input{chapters/overview}
 \chapter{Kernel based methods}
 \input{chapters/kernel_based_methods}
+
+\chapter*{List of Lectures}
+\addcontentsline{toc}{chapter}{List of Lectures}
+\begin{itemize}
+    \renewcommand*{\do}[1]{\item \hyperlink{#1}{Lecture \StrBehind{#1}{c}}}
+    \dolistloop{\lecturelist}
+\end{itemize}
 \end{document}

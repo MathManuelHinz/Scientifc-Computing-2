@@ -27,6 +27,7 @@
 \usepackage{tocloft}
 \usepackage{hyperref}
 \usepackage{etoolbox}
+\usepackage{xstring}
 
 \definecolor{mygray}{RGB}{239,240,241}
 \definecolor{mycolor}{RGB}{6,77,135}
@@ -90,12 +91,6 @@
   
 }
 
-\newcommand{\printlecture}[2][,]{{% Print list
-  \def\listsep{\def\listsep{#1}}% Delayed execution of list separator
-  \renewcommand{\do}[1]{\listsep`##1'}%
-  [\dolistloop\lecturelist]
-}}
-
 \def\C{\mathbb{C}}
 \def\R{\mathbb{R}}
 \def\N{\mathbb{N}}
@@ -157,7 +152,7 @@
 
 \def\lecturelist{}
 
-\newcommand{\beginlecture}[2]{\marginnote{Start of lecture #1\label{lec#1}\listadd{\lecturelist}{lec#1} (#2)}}
+\newcommand{\beginlecture}[2]{\hypertarget{lec#1}{}\listxadd{\lecturelist}{lec#1}\marginnote{Start of lecture #1 (#2)}}
 \newcommand{\dhighlight}[1]{{\color{mycolor}{\underline{{\textbf{#1}}}}}}
 \newcommand{\highlight}[1]{{\color{mycolor}{\textbf{#1}}}}
 \newcommand{\includeproblem}[2]{
