@@ -26,6 +26,7 @@
 \usepackage{fancyhdr}
 \usepackage{tocloft}
 \usepackage{hyperref}
+\usepackage{etoolbox}
 
 \definecolor{mygray}{RGB}{239,240,241}
 \definecolor{mycolor}{RGB}{6,77,135}
@@ -89,6 +90,13 @@
   
 }
 
+\newcommand{\printlist}[2][,]{{% Print list
+  % http://tex.stackexchange.com/a/89187/5764
+  \def\listsep{\def\listsep{#1}}% Delayed execution of list separator
+  \renewcommand{\do}[1]{\listsep`##1'}%
+  [\dolistloop\languagelist]
+}}
+
 \def\C{\mathbb{C}}
 \def\R{\mathbb{R}}
 \def\N{\mathbb{N}}
@@ -104,6 +112,7 @@
 \def\Mloc{\mathcal{M}_{\text{loc}}}
 \def\as{\text{ a.s. }}
 \def\cov{\text{Cov}}
+\def\Id{\text{Id}}
 
 \counterwithout*{equation}{equation}
 \renewcommand{\theequation}{\arabic{equation}}
@@ -148,7 +157,7 @@
 \renewcommand{\cftsubsubsecleader}{\color{mycolor} \cftdotfill{\cftsecdotsep}}
 
 
-\newcommand{\beginlecture}[2]{\marginnote{Start of lecture #1 (#2)}}
+\newcommand{\beginlecture}[2]{\marginnote{Start of lecture #1\label{lec#1} (#2)}}
 \newcommand{\dhighlight}[1]{{\color{mycolor}{\underline{{\textbf{#1}}}}}}
 \newcommand{\highlight}[1]{{\color{mycolor}{\textbf{#1}}}}
 \newcommand{\includeproblem}[2]{

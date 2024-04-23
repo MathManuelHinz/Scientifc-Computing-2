@@ -480,3 +480,326 @@ take any $X=\{x_1,\dots,x_N\}\subset\Omega$ and $a\in\R^n$
 \begin{aremark}
     The subspace property does not hold for arbitrary Hilbert spaces, this tells us that a RKHS is really not the same as a normal Hilbert space!
 \end{aremark}
+
+\beginlecture{04}{18.04.24}
+
+Remember: Kernels of the Mercer form 
+\[k(x,y)=\sum_{i\in I}\lambda_i \varphi_i(x)\varphi_i(y)\]
+with the summability condition 
+\[k(x,x)=\sum_{i\in I}\lambda_i \varphi_i^2(x)<\infty.\]
+
+Then observe 
+\begin{align*}
+    |f(x)|&=\left\vert \sum_{i\in I}\langle f,\varphi_i\rangle_\cH\phi_i(x)\right\vert\\
+    &\leq\sum_{i\in I}\left\vert \frac{\langle f,\varphi_i\rangle_\cH}{\sqrt{\lambda_i}}\right\vert|\varphi_i(x)|\sqrt{\lambda_i}\\
+    &\leq \sqrt{\sum_{i\in I}\frac{\langle f,\varphi_i\rangle_\cH}{\sqrt{\lambda_i}}}\sqrt{\underbrace{\sum_{i\in I}\varphi_i^2(x)\lambda_i}_{<\infty}}
+\end{align*}
+
+\[\cH\coloneqq\left\{f\in \cH: \Vert f\Vert_\lambda^2=\sum_{i\in I}\frac{\langle f,\varphi_i\rangle_\cH}{\sqrt{\lambda_i}}\right\}\]
+
+\begin{equation}\label{eq:003}
+    \langle f,g\rangle_\lambda = \sum_{i\in I}\frac{\langle f,\varphi_i\rangle_\cH\langle g,\varphi_i\rangle_\cH}{\lambda_i}\hspace{2cm} \forall f,g\in\cH_\lambda  
+\end{equation}
+
+Using \ref{eq:003} as the kernel, we have to check if all $f_x\coloneqq k(x,\cdot)\in\cH_\lambda$.
+
+Observe 
+\begin{align*}
+    \langle f_x,\varphi\rangle_\cH=\lambda_i\varphi_i(x)
+\end{align*}
+and \begin{align*}
+    \sum_{i\in I}\frac{\langle f_x,\varphi_i\rangle_\cH^2}{\lambda_i}=\sum_{i\in I}\lambda_i \varphi_i^2(x)<\infty
+\end{align*}
+to see $f_x\in \cH_\lambda$.
+
+\highlight{Check the reproduction equation}
+
+\begin{align*}
+    \langle f,k(x,\cdot)\rangle_\lambda&= \sum_{i\in I}\frac{\langle f,\varphi_i\rangle_\cH\langle k(x,\cdot),\varphi_i\rangle_\cH}{\lambda_i}\\
+    &=\sum_{i\in I} \frac{\langle f,\varphi_i\rangle\lambda_i\varphi_i(x)}{\lambda_i}=f(x)\hspace{2cm}\forall x\in\Omega
+\end{align*}
+
+The kernel therefore reproduces on $\cH_\lambda$. The proves theorem \ref{thm1.13}.
+
+If a Hilbert space of functions on $\Omega$ has a countable ONB $\{\varphi_i\}_{i\in I}$, each summability condition (**) leads to a reproducing mercer kernel (*) for a
+suitable subspace of functions with continuous point evaluations.
+%TOFIX 3=*= ist mercer kernel of he form und die summe ist **
+
+\begin{corollary}\label{cor:1.14}
+    The spaces $\cH_\lambda$ defined above are the natives spaces of the corresponding
+    Mercer kernels.
+\end{corollary}
+
+\begin{example}[Trigometric polynomials]
+    Consider the space of trigometric polynomials $\frac{1}{\sqrt{2}},\cos(nx),\sin(nx),n\in\N$ 
+    which are \highlight{orthonormal} in the inner product
+    \[\langle f,g\rangle=\frac{1}{\pi}\int_{-\pi}^{\pi} f(t)g(t)dt.\]
+
+    With $I=(0,0)\cup (\N,0)\cup(0,\N)$
+    \[\varphi_i(x)=\begin{cases}
+        \frac{1}{\sqrt{2}} & i=(0,0)\\
+        \cos(nx) & i=(n,0), n\geq 1\\
+        \sin(nx) & i=(n,0), n\geq 1
+    \end{cases}\]
+    So for $f\in \cH$
+    \[f=\sum_{i\in I}\langle f,\varphi_i \rangle_\cH \varphi_i.\]
+
+    All $\varphi_i$ are uniformly bounded, so the summability condition does hold when the weights are summable.
+
+    Fixing some $m\geq 1$, we define 
+    \[\lambda_i=\begin{cases}
+        1 & i=(0,0)\\
+        n^{-2m} & \text{otherwise}
+    \end{cases}\]
+
+    We set the Mercer kernel\marginnote{this can also be tought of as an \highlight{extension kernel}}
+    
+    \[k_{2m}(x,y)\coloneqq \frac{1}{\sqrt{2}}+\sum_{n=1}^\infty n^{-2m}(\cos(nx)\cos(ny)+\sin(nx)\sin(ny))\]\marginnote{This can be rewritten with the usual trigonometric rules}
+
+    One can see $K_{2m}''=K_{2m-2}$, so $K_2m$ piecewise polynomial of degree $2m$, which is 
+    $2m-2$ times differentiable.
+
+    %Insert picture
+
+
+\end{example}
+
+\subsection{Kernels for subspaces}
+
+Let us fix a nonempty set $X\subset\Omega$ and look at 
+the closed subspace 
+\[\cH_X\coloneqq \overline{\text{span}\{k(x,\cdot)|x\in X\}}\subseteq\cH\]
+
+Projector for $\cH$ to the closed subspace $\cH_0$: $\pi_0:\cH\to\cH_0$ with properties \marginnote{This is NOT $\{\cH_0\}$, but a generic subspace}
+\begin{itemize}
+    \item $\pi_0^2=\pi_0$
+    \item $\pi_0$ gives unique best approximation in $\cH_0$, $u\mapsto u_0$ %SEE theorem 1.17
+    \item $u_0\perp u-u_0$
+    \item $\text{Id}-\pi_0$ projects onto the orthogonal complement $\cH_0^\perp=\{u\in\cH\mid \langle u,v\rangle_\cH\forall v\in \cH_0\}$
+    \item $\cH=\cH_0+\cH_0^\perp$
+\end{itemize}
+
+\begin{theorem}\label{thm:1.15}
+    Let $\cH_0$ be a closed subspace of $\cH$ with reproducing kernel $k_0$ and 
+    let $\pi_0:\cH\to\cH_0$ be the projection onto $\cH_0$.
+
+    The subspace kernel is 
+    \[k_0(x,\cdot)= \pi_0k(x,\cdot)\]
+    for all $x\in\Omega$. The reproducing kernel for the orthogonal 
+    complement $\cH_0^\perp$ is $k-k_0$.
+\end{theorem}
+
+\begin{proof}
+    $\text{Id}=\pi_0+(\text{Id}-\pi_0)=\pi_0+\pi_0^\perp$.
+
+    Thus $f(x)=(\pi_0\circ f)(x)+(\pi_0^\perp\circ f)(x)$ inserted into the
+    reproducing equation 
+    \begin{align*}
+        f(x)&=\langle f,k(x,\cdot)\rangle_\cH\\
+        &=\langle \pi_0f+\pi_0^\perp f,\pi_0k(x,\cdot)+\pi_0^\perp k(x,\cdot)\rangle_\cH \\
+        &=\langle \pi_0 f,\pi_0 k(x,\cdot)\rangle+\langle \pi_0^\perp f,\pi_0^\perp k(x,\cdot)\rangle
+    \end{align*}
+    Using $f\in \cH_0$ and $f\in \cH_0^\perp$ eliminates on part of the sum each and the statements follow.
+\end{proof}
+
+\begin{remark}
+    Orthogonal space decompositions correspond to additive kernel decompositions using the appropriate
+    projections.
+\end{remark}
+
+\begin{theorem}\label{thm:1.16}\marginnote{This is a statement we would expect for our later use case of approximation and interpolation}
+    Let $X\subseteq\Omega$ be nonempty. 
+    For the closed subspace $\cH_X$ it holds 
+    \[\cH_X^\perp=\{f\mid f\in \cH: f(X)=\{0\}\}.\]
+\end{theorem}
+
+\begin{proof}
+    If $f(X)=\{0\}$, then $\langle f,v\rangle_\cH=0\forall v\in \cH_X$.
+    \[f(x)=\langle f,k(x,\cdot)\rangle_\cH\]
+    since $f\in\cH_X^\perp$ by the reproduction equation and conversely we set for 
+    $f\in\cH_X^\perp$ that $f(X)=\{0\}$.
+\end{proof}
+
+With $\pi_X$ the projector from $\cH$ to $\cH_X$ we denote 
+\[f_X\coloneqq \pi_X(f).\]
+Standard results from Hilbert space theory gives us 
+\begin{theorem}\label{thm:1.17}
+    Each function $f\in\cH$ has an orthogonal decomposition 
+    \[f=f_X+f_{X^\perp}\]
+    with $f_X\in\cH_X$ and $f_{X^\perp}\in\cH_X^\perp$. In particular 
+    each $f\in \cH$ has an interpolant $f_X\in\cH_X$ recovering the values of $f$ on $X$.
+    Additionally 
+    \begin{align*}
+        \Vert f-f_X\Vert_{\cH}=\inf_{g\in\cH_X} \Vert f-g\Vert_\cH
+    \end{align*}
+    and 
+    \[\Vert f_X\Vert_\cH=\inf_{g\in\cH:\stackrel{f(x)=g(x)}{\forall x\in X}}\Vert g\Vert_\cH=\inf_{v\in\cH_{X^\perp}}\Vert f-v\Vert_\cH\]
+\end{theorem}
+
+\begin{corollary}\label{cor:1.18}\marginnote{This is just the previous theorem in words}
+    The interpolant $f_X\in\cH_X$ to a function $f$ on $X$ is at the same time 
+    the best approximation to $f$ from all functions in $\cH_X$.    
+\end{corollary}
+
+\begin{corollary}\label{cor:1.19}\marginnote{This property is usefull, if the norm encodes smoothness as well. Penalizing unnecessary changes of the function}
+    The interpolant $f_X\in\cH_X$ to a function $f$ on $X$ minimizes the norm 
+    under all interpolants from the full space $\cH$.
+\end{corollary}
+
+\begin{corollary}\label{cor:1.20}
+    For all sets $X\subseteq Y\subseteq \Omega$ and $f\in \cH$ we have 
+    \[\Vert f_X\Vert_\cH\leq \Vert f_Y\Vert_\cH \leq \Vert f\Vert_\cH\]
+    and 
+    \[\Vert f\Vert_{\cH}\geq \Vert f-f_X\Vert_\cH\geq\Vert f-f_y\Vert_{\cH}\]
+    where for completeness we define $f_\emptyset=0,f_{\emptyset^\perp}=f$ and 
+    $\cH_{\emptyset}=\{0\}$ with $\cH_{\emptyset^\perp}=\cH$.
+\end{corollary}
+
+
+\beginlecture{05}{23.04.24}
+
+Consider only $f(\cdot)=k(x,\cdot)$ for a fixed $f,x\in\Omega$.
+
+\begin{definition}\label{def:2.1:power_function}
+    The function \[P_X(x)\coloneqq \Vert k(x,\cdot)-k_X(x,\cdot)\Vert_\cH\hspace{2cm} x\in\Omega\]
+    is called \dhighlight{power function} w.r.t. the set $X$ and the kernel $k$.
+
+    A different definition goes with the \dhighlight{error functional} $\epsilon_{X,x}\in\cH^*$
+    \[\epsilon_{X,x} f\mapsto f(x)-(\Pi_X(f))(x).\]
+
+    The power function is then defined as $P_X(x)\coloneqq \Vert \epsilon_{X,x}\Vert_{\cH^*}$.
+\end{definition}
+
+\begin{theorem}\label{thm:2.2}
+    The two definitions for the power function are equivalent. 
+    $P_X$ has the following properties
+    \begin{enumerate}
+        \item $P_X(x)=0$ $\forall x\in X$
+        \item $P_\emptyset(x)^2=k(x,x)$ $\forall x\in \Omega$
+        \item $P_\Omega(x)=0$ $\forall x\in\Omega$
+        \item $0=P_\Omega(x)\leq P_Y(x)\leq P_X(x)\leq P_\emptyset(x)$ for $X\subseteq Y\subseteq \Omega$
+        \item $P_X(x)=\inf_{g\in\cH_X} \Vert k(x,\cdot)-g\Vert_\cH$ 
+        \item $P_X(x)=\sup_{f\in\cH,\Vert f\Vert_\cH \leq 1,f(X)=\{0\}} f(x)$ $\forall x\in\Omega$
+        \item $\forall x\in \Omega,f\in\cH$\[|f(x)-f_X(x)|=\vert f_X^\intercal(x)\vert\leq P_X(x)\Vert f_X^\intercal(x)\Vert_\cH= P_X(x)\Vert f-f_X\Vert_\cH\leq P_X(x)\Vert f\Vert_\cH\]
+    \end{enumerate}
+\end{theorem}
+
+\begin{aremark}
+    General approximation goal: Split the approximation error into an error of the space and an error of the function (similarly to SC1).
+
+
+    One aim is to generalize 7. to not rely on a specific point.
+\end{aremark}
+
+\begin{proof}
+    Due to $\langle\epsilon_{X,x},\epsilon_{X,x}\rangle_{\cH^*}=\langle R(\epsilon_{X,x}),R(\epsilon_{X,x})\rangle_\cH$
+    we have to show that the Riesz representer of $\delta_x\circ \Pi_X$ is $K_X(x,\cdot)$.
+
+    \begin{align*}
+        \langle f,R(\delta_x\circ\Pi_X)\rangle &= \delta_x\circ \Pi_X(f) = f_X(x)=\langle f_X,k(x,\cdot)\rangle_\cH\\
+        &=\langle f_X,k_X(x,\cdot)+k_{X^\intercal}(x,\cdot) \rangle_\cH\\
+        &\stackrel{f_X\perp K_{X^\intercal}}{=}\langle f_X,k_X(x,\cdot)\rangle_\cH=\langle f-f_{X^\intercal},k_X(x,\cdot)\rangle_\cH\\
+        &\stackrel{f_{X^\intercal}\perp K_X}{=}\langle f,k_X(x,\cdot)\rangle_\cH
+    \end{align*}
+
+    Proof of 7.:
+
+    \begin{align*}
+        f(x)-f_X(x)&=f_{X^\intercal}(x)=\langle f_{X^\intercal},k(x,\cdot) \rangle_\cH\\
+        &=\langle f_{X^\intercal},k(x,\cdot)-\underbrace{k_X(x,\cdot)}_{ f_{X^\intercal}\perp}k_X(x,\cdot)\rangle\\
+        &\stackrel{\text{C.S.}}{\leq}\dots=\Vert f_{X^{\intercal}}\Vert\cH P_X(x) 
+    \end{align*}
+
+    Proof of 6.:
+
+    We see from the first inequality 
+    \begin{align*}
+        P_X(x)\geq \sup_{\Vert f_{X^\intercal}\Vert_\cH\leq 1} |f_{X^\intercal}(x)|
+    \end{align*}
+
+    and equality must hold for the representer of $\epsilon_{X,x}$.\marginnote{Notice the connection to operator norm approaches to 6.}
+
+\end{proof}
+
+\begin{remark}
+    Consider the subspace $\cH_X^*=\overline{\text{span}\{\delta_x\mid x\in X\}}$ of the 
+    dual space of $\cH$. Then $5.$ can equivalently be given as 
+    \begin{equation}\label{eq:004}
+        P_X(x)\leq \inf_{\lambda\in \cH_X^*}\Vert \delta_x\Vert_{\cH^\intercal}  
+    \end{equation} %TODO Check if equality holds
+\end{remark}
+
+% Unique solution if in cH, else just a solution
+
+
+Consider the interpolation of $f(x)=k(x,\cdot)\in\cH$.
+
+For $x\in\Omega$ we get for the interpolant in $\cH_X$
+\begin{equation}\label{eq:005}
+  k(x_k,x)=\sum_{j=1}^Nu_j(x)k(x_j,x_k) \hspace{2cm} 1\leq k\leq N  
+\end{equation}
+which has solution coefficients $u_j(x)$ as a function on $\Omega$.
+
+\begin{aremark}
+    If the kernel matrix is invertible, $u_j$ is either 0 or 1. See Lagrange interpolation?
+
+    In our setting it is enough to know that it exists, but might not be unique.
+\end{aremark}
+
+\begin{theorem}\label{thm:2.3}
+    If the kernel matrix is non-singular the $u_j$ from \ref{eq:004} are $\in\cH_X$ and 
+    there is a Lagrange basis $u_j(x_k)=\delta_{jk},1\leq j,k\leq N$.
+    
+    In general it still holds\marginnote{This is sometimes called quasi-interpolation} \[f_X(x)=\sum_{j=1}^N u_j(x)f(x_j)\]
+
+    In the formula the influence of $X$ and $f$ are separated.%TODO
+
+\end{theorem}
+
+
+\begin{proof}
+    The first statement follows from \ref{eq:005}. From the second:
+    \begin{align*}
+        f_X(x)&=\sum_{k=1}^N a_kk(x_k,x)\\
+              &=\sum_{k=1}^N a_k\sum_{j=1}^N u_j(x)k(x_j,x_k)\\
+              &=\sum_{j=1}^N a_j(x)\underbrace{\sum_{k=1}^{N} a_kk(x_j,x_k)}_{=f_{a,X}=f(x_j)\forall x_j\in X}=\sum_{j=1}^N u_j(x)f(x_j)\qedhere
+    \end{align*}
+\end{proof}
+
+\begin{theorem}\label{thm:2.4}
+    The power function has the following explicit representation:
+    \[P_X(x)=k(x,x)-2\sum_{j=1}^N u_j(x)k(x_j,x)+\sum_{j=1}^N\sum_{k=1}^{N}u_j(x)u_k(x)k(x_j,x_k)=k(x,x)-k_X(x,x)\]
+\end{theorem}
+
+\begin{proof}
+    For $K_X\in \cH_X$ $k_X(x,z)=\sum_{j=1}^{N}u_j(x)k(x_j,z)$
+    \begin{align*}
+        P_X^2(x)&=\langle k(x,\cdot)-k_X(x,\cdot),k(x,\cdot)-k_X(x,\cdot) \rangle_\cH\\
+        &=k(x,x)-2\langle k(x,\cdot),\sum_{j=1}^N u_j(x)k(x_j,\cdot) \rangle_\cH+\sum_{j=1}^N\underbrace{\sum_{k=1}^{N}}_{a}u_j(x)\underbrace{u_k(x)k(x_j,x_k)}_{\text{with a } =k(x,x_j)}\\
+        &=k(x,x)-\underbrace{\sum_{j=1}^N u_j(x)k(x_j,x)}_{k_X(x,x)}\qedhere
+    \end{align*}    
+\end{proof}
+
+Consider $f_X(x)=\sum_{j=1}^Nu_j(x)f(x_j)$ the interpolant on $X$.
+
+Let us also consider arbitrary estimation formulas 
+\[(x,f)\mapsto \sum_{j=1}^N v_j(x)f(x_j)\]
+with no assumptions on the scalars $v_j$. For fixed $x$ we get for the 
+error functional $f\mapsto f(x)-\sum_{j=1}^{N} v_j(x)f(x_j)=\left(\delta_x \sum_{j=1}^N v_j(x)\delta_{x_j}\right)(f)$.
+
+Ad for optimal estimation for all $f\in\cH$, we should choose 
+$v_j$ to minimize the following expression:
+\[V_{X,v}(x)\coloneqq \Vert \delta_x-\sum_{j=1}^{N} v_j(x)\delta_{x_j}\Vert_{\cH^*}.\]
+
+Remember the dual form of the fifth property \ref{eq:004}:
+\[P_X(x)=\inf_{\lambda\in\cH^*}\Vert \delta_x-\lambda\Vert_{\cH^*}\] 
+we also saw that the function $u_j$ are the solution.
+
+We also see that the optimal error, in the worst case sense, is described to be the power function.
+
+\begin{theorem}\label{thm:2.5}
+    In the above sense, kernel based approximation yields the best linear 
+    estimation of unknown function values $f(x)$ from known function values $f(x_j)$
+    at points $x_j$.
+\end{theorem}
+
