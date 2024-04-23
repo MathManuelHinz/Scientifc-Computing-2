@@ -266,8 +266,8 @@ in matrix form
     Note that we only considered symmetric matrices, the above also holds if one of the matrices is not symmetric, but positive definite instead. %TODO: Klären, brauchen wir jetzt symmetric oder nicht?
 \end{remark}
 
-\begin{remark}%TODO Link to the definition of RKHS
-    Our overall aim is to go from kernels to a \highlight{reproducing kernel Hilbert space (RKHS)}. Therefore 
+\begin{remark}
+    Our overall aim is to go from kernels to a \highlight{Reproducing Kernel Hilbert space (RKHS)}. Therefore 
     we define candidate spaces and a bilinear form in a way we would expec them.
 \end{remark}
 
@@ -725,9 +725,10 @@ Consider only $f(\cdot)=k(x,\cdot)$ for a fixed $f,x\in\Omega$.
     Consider the subspace $\cH_X^*=\overline{\text{span}\{\delta_x\mid x\in X\}}$ of the 
     dual space of $\cH$. Then $5.$ can equivalently be given as 
     \begin{equation}\label{eq:004}
-        P_X(x)\leq \inf_{\lambda\in \cH_X^*}\Vert \delta_x\Vert_{\cH^\intercal}  
-    \end{equation} %TODO Check if equality holds
+        P_X(x)= \inf_{\lambda\in \cH_X^*}\Vert \delta_x\Vert_{\cH^\intercal}  
+    \end{equation} 
 \end{remark}
+
 
 % Unique solution if in cH, else just a solution
 
@@ -752,7 +753,7 @@ which has solution coefficients $u_j(x)$ as a function on $\Omega$.
     
     In general it still holds\marginnote{This is sometimes called quasi-interpolation} \[f_X(x)=\sum_{j=1}^N u_j(x)f(x_j)\]
 
-    In the formula the influence of $X$ and $f$ are separated.%TODO
+    In the formula the influence of $X$ and $f$ are separated.
 
 \end{theorem}
 

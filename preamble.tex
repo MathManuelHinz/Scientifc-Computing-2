@@ -90,11 +90,10 @@
   
 }
 
-\newcommand{\printlist}[2][,]{{% Print list
-  % http://tex.stackexchange.com/a/89187/5764
+\newcommand{\printlecture}[2][,]{{% Print list
   \def\listsep{\def\listsep{#1}}% Delayed execution of list separator
   \renewcommand{\do}[1]{\listsep`##1'}%
-  [\dolistloop\languagelist]
+  [\dolistloop\lecturelist]
 }}
 
 \def\C{\mathbb{C}}
@@ -156,8 +155,9 @@
 \renewcommand{\cftsubsecleader}{\color{mycolor} \cftdotfill{\cftsecdotsep}}
 \renewcommand{\cftsubsubsecleader}{\color{mycolor} \cftdotfill{\cftsecdotsep}}
 
+\def\lecturelist{}
 
-\newcommand{\beginlecture}[2]{\marginnote{Start of lecture #1\label{lec#1} (#2)}}
+\newcommand{\beginlecture}[2]{\marginnote{Start of lecture #1\label{lec#1}\listadd{\lecturelist}{lec#1} (#2)}}
 \newcommand{\dhighlight}[1]{{\color{mycolor}{\underline{{\textbf{#1}}}}}}
 \newcommand{\highlight}[1]{{\color{mycolor}{\textbf{#1}}}}
 \newcommand{\includeproblem}[2]{
