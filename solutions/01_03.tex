@@ -1,0 +1,130 @@
+All norms and scalar products w.r.t. $H$ if not specified.
+
+
+\dhighlight{a)} 
+
+\begin{proof}
+    \begin{align*}
+        |h_n(t)-h_m(t)|&\stackrel{\text{Reproduction equality}}{\leq}|\langle h_n-h_m,k(t,)\rangle|\\
+        &\stackrel{\text{C.S.}}{\leq}\Vert h_n-h_m\Vert_H\Vert k(t,\cdot)\Vert_H\to 0   
+    \end{align*}
+    
+    Therefore $h_n(t)$ is Cauchy $\implies h_n(t)$ converges.
+\end{proof}
+
+\dhighlight{b)}
+
+\begin{proof}
+    Show definition is well defined:
+
+1.: $\langle f,g\rangle\in\R$ for all $f,g\in\mathcal{N}_k$.
+
+$f_n,g_n$ Cauchy sequences, $f_n\to f,g_n\to g$ pointwise.
+
+1.1.:Show that $\lim_{n\to\infty}\Vert f_n\Vert_H$ exists in $\R$.
+
+\begin{align*}
+    |\Vert f_n\Vert_H -\Vert f_m\Vert_H|\leq \Vert f_n-f_m\Vert_H \implies \Vert f_n\Vert_H\text{ is Cauchy}
+\end{align*}
+
+and therefore bounded.
+
+1.2.: Show $\langle f,g\rangle_H = \lim_{n\to\infty} \langle t_n,g_n\rangle_H$ exists in $\R$.
+
+\begin{align*}
+    |\langle f_n,g_n\rangle_H-\rangle f_m,g_m\rangle_H|&=|\langle f_n-f_m,g_n\rangle_H+\langle f_m,g_n-g_m\rangle|\\
+    &\leq \Vert f_n-f_m\Vert_H \Vert g_n\Vert_H + \Vert f_n\Vert_H\Vert g_n-g_m\Vert_H
+\end{align*}
+
+Let $f_n,f_n',g_n$ Cauchy, $f_n\to f,f_n'\to f,g_n\to g$ pointwise.
+
+We need: 
+
+\begin{align*}
+    \lim_{n\to\infty}\langle f_n,g_n\rangle_H&=\lim_{n\to\infty} \langle f_n',g_n\rangle_H\\
+    \iff &\lim_{n\to\infty} \langle f_n-f_n',g_n\rangle_H=0\\
+    \iff &f_n\to 0\text{ pointwise }\implies \langle f_n,g_n\rangle\to 0\\
+    \iff &\forall f_n\to 0\text{ pointwise } \langle f_n,f_n\rangle\to 0\\
+    \iff &f=0\implies \langle f,f\rangle_H=0 
+\end{align*}
+
+$h_n=f_n-f_n'$.
+
+1.: $f_n$ is Cauchy in $H$
+
+\begin{align*}
+    \Vert (f_n-f_n')-(f_m-f_m')\Vert_H\leq \Vert f_n-f_m \Vert+\Vert f_n'-f_m'\Vert_H 
+\end{align*}
+
+2.: $h_n$ bounded by $M$(follows from Cauchy)
+
+3.: $h_n\to 0$ in $H$
+
+Fix $l\in\N$ and let $h_l=\sum_{i=1}^ma_ik(x,\cdot)$
+
+\begin{align*}
+    \langle h_n,h_l\rangle&=\lambda_{A^{(l),x^{(l)}}}(h_n)=\sum_{i=1}^m a_i h_m(x_i)\to 0\\
+    \implies (\star): \forall \epsilon>0:\exists n_0\in\N:\forall n\geq n_0 |\langle h_n,h_l\rangle|<\epsilon
+\end{align*}
+
+$h_n$ is Cauchy $\implies \forall \delta>0\exists l\in\N\forall n\geq l$: 
+\[\Vert h_n-h_l\Vert<\delta/M.\]
+
+Choose $n_0$ s.t. $(\star)$ holds with $\delta$
+
+\begin{align*}
+    \Vert h_n\Vert_H^2&=\langle h_n,h_n\rangle_H=\langle h_n,h_l\rangle+\langle h_n,h_n-h_l\rangle\\
+    &\leq \delta + \Vert h_n\Vert_H \Vert h_n-h_l\Vert<\delta+M\frac{\delta}{M}
+\end{align*}
+
+Choose $\delta=\frac{\epsilon}{2}$.
+
+Still have to show $\langle f,f\rangle =0$:
+
+\begin{align*}
+    \lim_{n\to\infty} f_n(t)=\lim_{n\to\infty} \langle f_n,k(t,\cdot)\rangle_H\leq \lim_{n\to\infty}\Vert f_n\Vert \underbrace{\Vert k(t,\cdot)\Vert}_{\text{bounded}}
+\end{align*}
+
+\end{proof}
+
+\dhighlight{c)}
+
+\begin{proof}
+$f_n$ Cauchy:
+
+$f_n\to f$ in $\mathcal{N}_k$ and $f\in\mathcal{N}_k$.
+
+Construct Cauchy sequence in $H$:
+
+$\lim_{n\to\infty}f_n{(k)}=f_n$ and $f_n^{(k)}\in H$.
+
+$\forall n\in\N$ choose $k(n)$ such that 
+\begin{align*}
+    \Vert f_n-f_n^{k(n)}\Vert<\frac{1}{n}
+\end{align*}
+
+$g_n=f_n^{(k(n))}$. Let $\epsilon>0$, $n_0=\max\{\frac{3}{\epsilon},m\}$
+
+$\forall k,l\geq m:\Vert f_k-f_l\Vert<\epsilon/3$
+
+\begin{align*}
+    \Vert g_n-g_m\Vert &\leq \Vert f_n^{(k(n))}-f_n\Vert +\Vert f_n-f_m\Vert+\Vert f_m-f_m^{(k(n))}\Vert\\
+    &\leq \frac{\epsilon}{3}+\frac{\epsilon}{3}+\frac{\epsilon}{3}=\epsilon
+\end{align*}
+
+for all $n,m\geq n_0$.
+
+Set $f\in\mathcal{N}_k$ as the limit of $g_n$ (because it is a Cauchy sequence in $H$).
+
+2.: $f_n$ converges to $f$ in $\mathcal{N}_k$.
+
+%$\forall n\geq \max\{\n_0,r\}$ s.t. $\forall l\geq r:\Vert g_n-f\Vert\leq \frac{\epsilon}{3}$
+
+\begin{align*}
+    \Vert f_n-f\Vert&\leq \Vert f_n-f_{n+1}\Vert + \Vert f_{n+1}-f_{n+1}^{(k(n+1))}\Vert + \Vert g_{n+1}-f\Vert\\
+    &<\frac{\epsilon}{3}+\frac{1}{n+1}+\frac{\epsilon}{3}=\epsilon
+\end{align*}
+\end{proof}
+
+
+

@@ -804,3 +804,150 @@ We also see that the optimal error, in the worst case sense, is described to be 
     at points $x_j$.
 \end{theorem}
 
+% BEGIN TUTOTRIAL
+
+%12-14 2.035
+
+% Include die Aufgaben
+\input{solutions/01_03}
+\input{solutions/01_04}
+\input{solutions/g02_02}
+
+\beginlecture{06}{25.04.24}
+% STATISTICS, Yay <3
+\[k(s,t)=\text{cov}(X_s,X_t)\]
+The kernel comes from a covariance, where 
+for every $t$ in some $\Omega$, we have a random variable with finite  second moments.
+
+Consider $X_t$ with zero mean. In this case, what we did is called 
+\dhighlight{(simple) Krigihs}\marginnote{connection to geo-statistics!} % TODO: Nachschauen wie er hieß
+
+$V_{X,v}^2(x)$ can be understood as the variance of the prediction error.
+
+Now define the error of some general linear predictor at $x$
+\[\mathcal{E}_{X,V,x}\coloneqq X_x-\sum_{j=1}^n V_j(x)X_{x_j}\] % Nachschauen ob v groß oder klein
+
+\marginnote{Statistics pov: This is an ubiased estimator}
+
+\begin{align*}
+    \bE(\mathcal{E}_{X,V,x}^2)&=\underbrace{\cov}_{=k}(X_x,X_x)-2\sum_{j=1}^N V_j(x)\cov(X_x,X_{x_j})+\sum_{j=1}^N\sum_{k=1}^N v_j(x)v_k(x)\cov(X_{x_j},X_{x_k})\\
+    &=\langle \delta_x, \delta_x\rangle_{\cH^*}-2\sum_{j=1}^{N}v_j\langle \delta_x,\delta_{x_j}\rangle_{\cH^*}+\sum_{j=1}^{N}\sum_{k=1}^N v_j(x)v_k(x)\langle \delta_{x_j},\delta_{x_k}\rangle_{\cH^*}\\
+    &=V_{X,v}^2(x)
+\end{align*}
+
+Short revision of the condition number:
+
+\begin{align*}
+    \kappa(A)&=\frac{|\lambda_{\max} (A)|}{|\lambda_{\min} (A)|}\\
+    Ax=b & \frac{\Delta x}{|x|}\leq \kappa(A)\frac{|\Delta b|}{|b|}
+\end{align*}
+
+\dhighlight{Power function and stability}
+
+There is an uncertainty principle (Schabach 1995):\marginnote{We can somehow fix this via regularisation, which in this case is both usefull numerically and meaningful from a statistics point of view}
+
+It is impossible to make the power function and the condition number 
+of the kernel matrix small at the same time. 
+
+To make this precise: enrich $X=\{x_1,\dots,x_n\}$ with another point $X_0=x$
+and define $u_0(\cdot)=-1$
+\[A=k(x_j,x_k)_{0\leq j,k\leq N}\]
+\begin{align*}
+    u^\intercal A u&=\sum_{j=0}^N\sum_{k=0}^N u_j(x)u_k(x)k(x_j,x_k)\\
+    &\stackrel{u_0=-1}{=}k(x,x)-2\sum_{j=1}^Nu_j(x)k(x,x_j)+2\sum_{j=1}^N\sum_{k=1}^Nu_j(x)u_k(x)k(x_j,x_k)\\
+    &\stackrel{\text{thm. \ref{thm:2.4}}}{=}P_X^2(x)
+\end{align*}
+
+$A$ has $n+1$ non-negative real eigenvalues $\lambda_0\geq \lambda_1\geq \dots\geq \lambda_N\geq 0$.
+
+\begin{align*}
+    \lambda_N\Vert u\Vert_2^2\leq u^\intercal A u\leq \lambda_0\Vert u\Vert_2^2
+\end{align*}
+
+gives 
+\[P_X^2(x)\geq \lambda_N\left(1+\sum_{j=1}^N |u_j(x)|^2 \right)\geq \lambda_N\]
+
+Elimination of the special value of the point $x$ gives 
+
+\begin{theorem}\label{thm:2.6}
+    The kernel matrix for $N$ points $\{x_1,\dots,x_n\}=X$ has a smallest\marginnote{This holds for every $x\in \Omega$}
+    eigenvalue $\lambda$ bounded from above by \[\lambda\leq \min_{1\leq j\leq N}P_{X\setminus\{x_j\}}^2\]
+\end{theorem}
+
+Back to approximation
+
+\begin{align*}
+    \vert f(x)-f_X(x)\vert\leq\vert P_X(x)\vert \Vert f\Vert_\cH
+\end{align*}
+
+Assume that any directional derivative of both $f$ and $f_X$ is bounded 
+by some $C$:
+\begin{align*}
+    \vert f(x)-f_X(x)\vert \leq \underbrace{\vert f(x_j)-f_X(x_j)\vert}_{=0} +2C\Vert x-x_j\Vert_2\leq 2Ch_{X,\Omega} 
+\end{align*}
+
+if the connecting line between $x$ and $x_j$ is in $\Omega$ % Bld einfügen!
+
+\begin{definition}\label{def:2.7:fill_distance}\marginnote{How large are the holes in $\Omega$ such that we don't hit an $x\in X$.  It describes the size of the largest data free domain}
+    The \dhighlight{fill distance} of a set of points $X\subseteq \Omega$ for a 
+    bounded $\Omega$ is defined to be 
+    \[h_{X,\Omega}=\sup_{x\in\Omega}\min_{1\leq j\leq N}\Vert x-x_j\Vert_2\]
+\end{definition}
+
+
+To get bounds on the optimal approximation, we can consider 
+some functions $v_0,\dots,v_N$ instead of the optimal $u_j$.
+
+\begin{equation}\label{eq:006}
+    P_X^2(x)\leq k(x,x)-2\sum_{j=1}^N v_j(x)k(x_j,x)+\sum_{j=1}^{N}\sum_{k=1}^{N}v_j(x)v_k(x)k(x_j,x_k)
+\end{equation}
+
+The simplest case uses nearest neighbor reconstruction. 
+
+Assume that for each $x\in\Omega$ we pick a $x_{nn(x)}$ and define 
+\[v_j(x)=\begin{cases}
+    1 & j=nn(x)\\
+    0 & \text{else}
+\end{cases}\]
+
+Then 
+\begin{align*}
+    P_X^2(x)&\leq k(x,x)-2k(x_{nn(x)},x+k(x_{nn(x)},x_{nn(x)}))\\
+    &\stackrel{}{(7)}d_k((x,x_{nn(x)}))^2=\text{dist}(x,x_{nn(x)})^2
+\end{align*}
+
+\begin{theorem}\label{thm2.8}
+    For $k$ positive semi-definite the power function on 
+    non-empty sets $X$ of interpolation points satisfies 
+    \[p_X^2(x)\leq \min_{x_j\in X} d_k(x,x_j)\] 
+    with $d_k$ as in (7). % TODO
+\end{theorem}
+
+
+Assume that we can prove $P_X(x)\leq CE(x,h)$ for all 
+data sets $X$ with fill distance $h$.
+
+This implies (by theorem \ref{thm:2.2})
+\begin{align*}
+    |f(x)-\sum_{j=1}^N u_j(x)f(x_j)|\leq CE(x,h)\Vert f\Vert_\cH
+\end{align*}
+
+\marginnote{This simplifies the notation, once one understands what is happening :)}
+
+We know introduce the error operator 
+\[E_x^y(f(y))\coloneqq f(x)-\sum_{j=1}^Nv_j(x)f(x_j)\]
+to set 
+\begin{align*}
+    P_X^2(x)&\leq (\ref{eq:006})=k(x,x)+\sum_{j=1}^N v_j(x)\left(\sum_{k=1}^{N}v_k(x)k(x_j,x_k)-k(x_j,x)\right)\\
+    &=E_x^z(k(z,x))-\sum_{j=1}^N v_j(x)E_x^z(k(z,x_j))\\
+    &=E_x^yE_x^z(k(z,y))
+\end{align*}
+
+We are after a bound such as 
+\[\vert E_x^y(f(y))\vert =\left\vert f(x)-\sum_{j=1}^N v_j(x)f(x_j) \right\vert\leq \mathcal{E}_{X,k}(h)\Vert L f\Vert \]
+We then bound the power function by 
+\[P_X^2(x)\left\vert E_x^yE_x^z k(z,y) \right\vert\leq \mathcal{E}_{X,k}(h)\Vert L^y E_x^z k(z,y)\Vert\leq \mathcal{E}_{X,k}^2\Vert L^y\Vert \Vert L^z k(y,z)\Vert \]
+assume the final expression makes sense.
+
+
+
