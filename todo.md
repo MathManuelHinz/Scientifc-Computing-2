@@ -1,0 +1,3 @@
+- Chapter 2 fixen
+- Tutorial fertig schreiben
+- TODOS innerhalb der Kapitel bearbeiten!
