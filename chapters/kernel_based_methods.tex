@@ -937,8 +937,155 @@ to set
 We are after a bound such as 
 \[\vert E_x^y(f(y))\vert =\left\vert f(x)-\sum_{j=1}^N v_j(x)f(x_j) \right\vert\leq \mathcal{E}_{X,k}(h)\Vert L f\Vert \]
 We then bound the power function by 
-\[P_X^2(x)\left\vert E_x^yE_x^z k(z,y) \right\vert\leq \mathcal{E}_{X,k}(h)\Vert L^y E_x^z k(z,y)\Vert\leq \mathcal{E}_{X,k}^2\Vert L^y\Vert \Vert L^z k(y,z)\Vert \]
+\[P_X^2(x)\left\vert E_x^yE_x^z k(z,y) \right\vert\leq \mathcal{E}_{x,k}(h)\Vert L^y E_x^z k(z,y)\Vert\leq \mathcal{E}_{X,k}^2\Vert L^y\Vert \Vert L^z k(y,z)\Vert \]
 assume the final expression makes sense.
+
+
+\beginlecture{07}{30.04.24}
+
+First, univariate case, $\Omega=[a,b], X=\{x_1,\dots,x_n\}\subset\Omega$. For a 
+given $x\in\Omega$
+\[X_x=\{x_j\in X\mid j\in N(x)\subseteq \{1,\dots,N\}\}\]
+
+$f\in C^k$, Taylor polynomial at $x_0$
+\[p(x)=\sum_{j=0}^{k-1}\frac{f^{(j)}(x_0)}{j!}(x-x_0)^j\]
+for $|x-x_0|\leq h$ we have the local approximation error 
+\[|f(x)-p(x)|=\frac{\vert f^{(k)}\vert}{n!}|x-x_0|^k\leq C(f)h^k\]
+\marginnote{This approximation error holds for approximation which recovers polynomials locally!} % TODO: Check
+
+From formula for interpolation in Newton form 
+\begin{align*}
+    f(x)-p_{X}(x)&={[x,X_x]f} \prod_{x_j\in X_x} (x-x_j)\forall x\in [a,b]\\
+    &\leq \frac{\Vert f^{(k)}\Vert_{\infty,[a,b]}}{k!}\underbrace{\prod_{x_j\in X_x} (x-x_j)}_{\leq C h^k}
+\end{align*}
+
+\marginnote{If we are careful, we can controll the constant $C$ above!}
+
+We can now use this to bound 
+\begin{align*}
+    p_X^2(x)\leq (Ch^k)^2\sup_{a\leq z\leq b}\sup_{a\leq y\leq b}\left\vert \frac{\partial^k}{\partial z^k}\frac{\partial^k}{\partial y^k}k(a,b)  \right\vert %TODO
+\end{align*}
+
+\begin{theorem}\label{thm:29}
+    Assume a psd kernel $k$ on $[a,b]$ that is $k$ times differentiable. Then 
+    for every point set $X\subset [a,b]$ of at least $k$ points with 
+    fill distance at most $h$ the power function can be bounded 
+    \begin{equation}
+        P_X(x)\leq C_k h^k
+    \end{equation}
+    with $C_k$ depending on $k$ and $X$. 
+\end{theorem}
+
+\begin{definition}\label{def:30}
+A compact domain $\Omega\subset\R^d$ allows
+
+\dhighlight{uniformly stable local polynomial reproduction}
+of order $l\geq 1$, if there are positive constants $c_1,c_2,h_0$, s.t. 
+for all finite sets of points $X\coloneqq \{x_1,\dots,x_n\}$ with fill distance 
+$h_{X,\Omega}\leq h_0$ there are scalar functions $u_1(x),\dots,x_N(x)$ s.t. 
+\begin{enumerate}
+    \item \[\sum_{j=1}^{N} u_j(x)p(x_j)=p(x)\] for all polynomials $p\in \mathcal{P}_l^d$ and $x\in\Omega$.   
+    \item $\sum_{j=1}^N \vert u_j(x)\vert\leq c_1$
+    \item $u_j(x)=0$ if $\Vert x- x_j\Vert_2>C_s h_{X,\Omega}$.
+\end{enumerate} 
+\end{definition}
+
+\begin{aremark}
+    We will only handle positive definite kernels, the results generalizes for psd kernels with additional conditions on the kernel.
+\end{aremark}
+
+We know focus on positive definite kernels. 
+\begin{theorem}\label{thm:31}
+    Let $\Omega\subset \R^d$ and let $k:\Omega\to\Omega$ be a p.d. kernel. 
+    Let $X$ be a set of $N$ distinct points of $\Omega$ and define the quadratic form 
+    $\Omega:\R^n\to\R$ for any $x\in\Omega$ (see \ref{thm:2.4})
+    \[Q(u)=k(x,x)-2\sum_{j=1}^N a_j(x,x_j)+\sum_{j=1}^{N}\sum_{k=1}^{N}u_ju_kk(x_k,x_j)\]
+    The min of $Q(u)$ is given for the vector from \ref{thm:2.3} denoted as $u^*$ with 
+    $u_j^*(x_k)=\delta_{jk}$ and we have \[Q(u^*(x))\leq Q(u)\]
+\end{theorem}
+
+\begin{proof}
+    With $b=[k(x_,\cdot),\dots,k(x_k,\cdot)]^\intercal$ and $A_{i,j}=k(x_i,x_j)$, $i,j=1,\dots,N$ 
+    we have 
+    \[ Q(u)=k(x,x)-2 b^\intercal (x)u+u^\intercal A u.\]
+    The min is the solution of $Au=b$\remark{in the positive definite setup only!},
+    which is fullfilled by $u=u^*(x)$.
+\end{proof}
+
+\begin{theorem}\label{thm:32}
+    Assume $\Omega\subseteq \R^d$ bounded and satisfies an interior cone condition.
+    Suppose $k\in C^{2k}(\Omega\times \Omega)$ is a symmetric positive definite kernel 
+    with native space $\cH$. Let $f_X$ be the interpolant to $f\in\cH$ on the set $X=\{x_1,\dots,x_n\}$.
+    Then there are positive constants $h_0,C$ (independent of $x,f,k$) s.t. 
+    \begin{equation*}
+        |f(x)-f_X(x)|\leq Ch_{X,\Omega}^k \sqrt{C_k(x)}\Vert f\Vert_\cH
+    \end{equation*} 
+    provided $h_{X,\Omega}\leq Ch_0$. Here 
+    \[C_k(x)=\max_{|\beta|=2k} \sup_{x,y\in \Omega\cap B(x,C_2h_{X,\Omega})}\left\vert D_2^\beta (k(x,y))\right\vert\]
+\end{theorem}
+
+First some further notation:
+
+For $\beta=(\beta_1,\dots,\beta_d)\in\N_0^d$ we define 
+\[D^\beta=\frac{\partial^{|\beta|}}{(\partial x_1)^{\beta_1}\cdot\dots\cdot (\partial x_d)^{\beta_d}}\]
+with $D_2^\beta$ we indicate that $D^\beta$ is applied to $k(x,\cdot)$. Multivariate 
+Taylor expansion of $k(x,\cdot)$ centered at x:
+\[k(x,y)=\underbrace{\sum_{|\beta|<2l}\frac{D_2^\beta k(x,x)}{\beta!}}_{\sum_\beta T(x,\beta)}(y-x)^\beta+R(x,y)\] 
+
+\[R(x,y)=\sum_{|\beta|=2l}\frac{D_2^\beta k(x,\xi_{x,y})}{\beta}(y-x)^\beta\]
+where $\xi_{x,y}$ lines on the line connecting $x,y$.
+
+\begin{proof}
+    Theorem \ref{thm:2.2} $|f(x)-f_X(x)|\leq P_X(x)\Vert f\Vert_\cH$. 
+    We know $P_X^2(x)=Q(u^*(x))$. Given the interior cone condition, we 
+    can obtain a $u(x)$ that has polynomial precision of degree $l\geq 2k-1$. 
+    For those $u$ we see 
+    \begin{align*}
+        P_X^2(x)\leq Q(u)=k(x,x)-2\sum_{k=1}^{N}u_k(x,x_k)+\sum_{j=1}^{N}\sum_{k=1}^{N} u_ju_k k(x_j,x_k)
+\end{align*}
+
+Apply Taylor expansion centered at $x$ to $K(x,\cdot)$ and centered at $x_j$ to $k(x_j,\cdot)$
+
+\begin{align*}
+    Q(u)=k(x,x)-2\sum_{k=1}^{N}u_K\left[\sum T(x,\beta)(x_k-x)^\beta+R(x,x_k) \right]+\sum_{j=1}^{N}\sum_{k=1}^N u_j u_k \left[\sum T(x_j,\beta)(x_k-x_j)^\beta R(x_j,x_k) \right]
+\end{align*}
+
+We identify $p(z)=(z-x)^\beta$, so that $p(x)=0$ unless $\beta=0$.
+
+With the polynomial reproduction of $u$, this simplifies to 
+\[Q(u)=k(x,x)-\underbrace{2k(x,x)}_{\beta=0}-2\sum_{k=1}^N u_k R(x,x_k)+\sum_{j=1}^{N} u_j\sum T(x_j,\beta)(x-x_j)^\beta+\sum_{j=1}^N\sum_{k=1}^N u_ju_k R(x_j,x_k)\] 
+
+Look at Taylor expansion 
+
+\begin{align*}
+    \sum T(x_j,\beta)(x-x_j)^\beta = k(x_j,x)-R(x_j,x)
+\end{align*}
+
+This gives 
+\begin{align*}
+    Q(u)=k(x,x)-\sum_{k}u_k\left[2R(x,x_k)-\sum_{j=1}^N u_j R(x_j,x_k) \right]+\sum_{j=1}^N u_j \left[k(x_j,x)-R(x_j,x)\right]
+\end{align*}
+
+Once more Taylor: $k(x_j,x)=k(x,x_j)=\sum_\beta T(x,\beta)(x_x-x)^\beta+R(x,x_j)$
+
+\begin{align*}
+    =0-\sum_k u_k \left[R(x,x_k)-\sum_{j=1}^N u_j R(x_j,x_k)+R(x_k,x) \right]
+\end{align*}
+
+The polynomial reproduction gives \marginnote{uniform stability}
+\[\sum_{k}|u_k|\leq C_1\]
+For $u_j\neq 0$ (with 3.) we have $\Vert x-x_j\Vert_2 \leq C_2 h_{X,\Omega}$
+and it holds $\Vert x_j-x_k\Vert \leq 2C_2h_{X,\Omega}$. Thereby all three can be bounded by
+an expression such as $Ch_{X,\Omega}^{2k}C_k(x)$.
+
+The interior cone condition shows that the ball remains inside, so that 
+$C_k(x)$ is well defined. Combining these bounds and taking the square root gives 
+the bound for the power function.
+\end{proof}
+
+
+
+
 
 
 
