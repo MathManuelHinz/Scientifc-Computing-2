@@ -62,8 +62,8 @@
 
     There are so called \highlight{zonal kernels}, for working on a sphere, where the kernel 
     can be represented as a function of an angle. An example are functions of inner products, such as 
-    \[k(x,y)=\exp(x^\intercal y).\]
-    Remember, $x^\intercal y$ is the (scaled) cosine of the angle between the two vectors.
+    \[k(x,y)=\exp(x^\perp y).\]
+    Remember, $x^\perp y$ is the (scaled) cosine of the angle between the two vectors.
 \end{remark}
 
 \begin{remark}
@@ -127,7 +127,7 @@ The following two examples show how one can handle non-euclidean origin spaces:
 
     Natural extensions to this kernel take e.g. word order, relevance or semantics into account,
     which can be achieved by using matrices in the scalar product:
-    \[k(t_1,t_2)=\langle S\Phi(t_1),S\Phi(t_2)\rangle=\Phi^\intercal(t_1)S^\intercal S\Phi(t_2.)\]
+    \[k(t_1,t_2)=\langle S\Phi(t_1),S\Phi(t_2)\rangle=\Phi^\perp(t_1)S^\perp S\Phi(t_2.)\]
 \end{example}
 \begin{example}[Graph kernels]
     Another non-euclidean data object are graphs, 
@@ -214,7 +214,7 @@ in matrix form
     \begin{enumerate}
         \item $K$ is a \highlight{Gram(-ian)} matrix\marginnote{A Gram matrix, is a matrix whose entries are given by inner products $K_{i,j}=\langle v_i,v_j\rangle$}
         \item \begin{align*}
-            a^\intercal K a&=\sum_{j,k=1}^N a_ja_k k(x_j,x_k)=\sum_{j,k=1}^Na_ja_k\sum_{i\in I}\varphi_i(x)\varphi_i(y)\\
+            a^\perp K a&=\sum_{j,k=1}^N a_ja_k k(x_j,x_k)=\sum_{j,k=1}^Na_ja_k\sum_{i\in I}\varphi_i(x)\varphi_i(y)\\
             &=\sum_{i\in I}\lambda_i\sum_{j=1}^N a_j\varphi_i(x_j)\sum_{k=1}^N a_k\varphi_i(x_k)=\sum_{i\in I}\lambda_i\left(\sum_{j=1}^N a_j\phi_i(x_j)\right)^2\geq 0
         \end{align*}
     \end{enumerate}
@@ -238,7 +238,7 @@ in matrix form
     The determinant of such a positve semidefinite matrix is nonnegative,
     therefore \[k(x,x)k(y,y)-k(x,y)^2\geq 0\]
     \underline{3.:} $2ab\leq a^2+b^2$ for all $a,b\in\R_0^+$. Therefore this follows from \ref{thm:1.5_item2}.\\
-    \underline{4.:} Expand $a^\intercal K a$ to see this.\\
+    \underline{4.:} Expand $a^\perp K a$ to see this.\\
     \underline{5.:} Follows from Lemma \ref{lemma:1.6}.\\
     \underline{6.:} Follows from Lemma \ref{lemma:1.6} and a bit more linear algebra.
 \end{proof}
@@ -251,13 +251,13 @@ in matrix form
 \end{lemma}
 
 \begin{proof}
-    Decompose $A=S^\intercal DS$ with $S$ an 
+    Decompose $A=S^\perp DS$ with $S$ an 
     orthogonal matrix and $D=\text{diag}(\lambda_1,\dots,\lambda_n)$ 
     a diagonal matrix with $\lambda_i\geq 0$ the eigenvalues of $A$.
 
     For all $q\in\R^N$ we look at 
     \begin{align*}
-        q^\intercal Cq&=\sum_{j,k}q_jq_ka_{jk}b_{jk}=\sum_{j,k=1}^N q_j q_k\sum_{m=1}^N\lambda_m S_{jm}S_{km}\\
+        q^\perp Cq&=\sum_{j,k}q_jq_ka_{jk}b_{jk}=\sum_{j,k=1}^N q_j q_k\sum_{m=1}^N\lambda_m S_{jm}S_{km}\\
         &=\sum_{m=1}^N \lambda_m \sum_{j,k=1}^N \underbrace{q_j S_{jm}}_{P_{k,m}} \underbrace{q_k S_{km}}_{P_{km}} b_{jk}=\sum_{m=1}^N\sum_{j,k=1}^N\underbrace{P_{jm}P_{km}b_{jk}}_{\geq 0\text{ since } B \text{ is psd}}\geq 0
     \end{align*}
 \end{proof}
@@ -680,7 +680,7 @@ Consider only $f(\cdot)=k(x,\cdot)$ for a fixed $f,x\in\Omega$.
         \item $0=P_\Omega(x)\leq P_Y(x)\leq P_X(x)\leq P_\emptyset(x)$ for $X\subseteq Y\subseteq \Omega$
         \item $P_X(x)=\inf_{g\in\cH_X} \Vert k(x,\cdot)-g\Vert_\cH$ 
         \item $P_X(x)=\sup_{f\in\cH,\Vert f\Vert_\cH \leq 1,f(X)=\{0\}} f(x)$ $\forall x\in\Omega$
-        \item $\forall x\in \Omega,f\in\cH$\[|f(x)-f_X(x)|=\vert f_X^\intercal(x)\vert\leq P_X(x)\Vert f_X^\intercal(x)\Vert_\cH= P_X(x)\Vert f-f_X\Vert_\cH\leq P_X(x)\Vert f\Vert_\cH\]
+        \item $\forall x\in \Omega,f\in\cH$\[|f(x)-f_X(x)|=\vert f_X^\perp(x)\vert\leq P_X(x)\Vert f_X^\perp(x)\Vert_\cH= P_X(x)\Vert f-f_X\Vert_\cH\leq P_X(x)\Vert f\Vert_\cH\]
     \end{enumerate}
 \end{theorem}
 
@@ -697,24 +697,24 @@ Consider only $f(\cdot)=k(x,\cdot)$ for a fixed $f,x\in\Omega$.
 
     \begin{align*}
         \langle f,R(\delta_x\circ\Pi_X)\rangle &= \delta_x\circ \Pi_X(f) = f_X(x)=\langle f_X,k(x,\cdot)\rangle_\cH\\
-        &=\langle f_X,k_X(x,\cdot)+k_{X^\intercal}(x,\cdot) \rangle_\cH\\
-        &\stackrel{f_X\perp K_{X^\intercal}}{=}\langle f_X,k_X(x,\cdot)\rangle_\cH=\langle f-f_{X^\intercal},k_X(x,\cdot)\rangle_\cH\\
-        &\stackrel{f_{X^\intercal}\perp K_X}{=}\langle f,k_X(x,\cdot)\rangle_\cH
+        &=\langle f_X,k_X(x,\cdot)+k_{X^\perp}(x,\cdot) \rangle_\cH\\
+        &\stackrel{f_X\perp K_{X^\perp}}{=}\langle f_X,k_X(x,\cdot)\rangle_\cH=\langle f-f_{X^\perp},k_X(x,\cdot)\rangle_\cH\\
+        &\stackrel{f_{X^\perp}\perp K_X}{=}\langle f,k_X(x,\cdot)\rangle_\cH
     \end{align*}
 
     Proof of 7.:
 
     \begin{align*}
-        f(x)-f_X(x)&=f_{X^\intercal}(x)=\langle f_{X^\intercal},k(x,\cdot) \rangle_\cH\\
-        &=\langle f_{X^\intercal},k(x,\cdot)-\underbrace{k_X(x,\cdot)}_{ f_{X^\intercal}\perp}k_X(x,\cdot)\rangle\\
-        &\stackrel{\text{C.S.}}{\leq}\dots=\Vert f_{X^{\intercal}}\Vert\cH P_X(x) 
+        f(x)-f_X(x)&=f_{X^\perp}(x)=\langle f_{X^\perp},k(x,\cdot) \rangle_\cH\\
+        &=\langle f_{X^\perp},k(x,\cdot)-\underbrace{k_X(x,\cdot)}_{ f_{X^\perp}\perp}k_X(x,\cdot)\rangle\\
+        &\stackrel{\text{C.S.}}{\leq}\dots=\Vert f_{X^{\perp}}\Vert\cH P_X(x) 
     \end{align*}
 
     Proof of 6.:
 
     We see from the first inequality 
     \begin{align*}
-        P_X(x)\geq \sup_{\Vert f_{X^\intercal}\Vert_\cH\leq 1} |f_{X^\intercal}(x)|
+        P_X(x)\geq \sup_{\Vert f_{X^\perp}\Vert_\cH\leq 1} |f_{X^\perp}(x)|
     \end{align*}
 
     and equality must hold for the representer of $\epsilon_{X,x}$.\marginnote{Notice the connection to operator norm approaches to 6.}
@@ -725,7 +725,7 @@ Consider only $f(\cdot)=k(x,\cdot)$ for a fixed $f,x\in\Omega$.
     Consider the subspace $\cH_X^*=\overline{\text{span}\{\delta_x\mid x\in X\}}$ of the 
     dual space of $\cH$. Then $5.$ can equivalently be given as 
     \begin{equation}\label{eq:004}
-        P_X(x)= \inf_{\lambda\in \cH_X^*}\Vert \delta_x\Vert_{\cH^\intercal}  
+        P_X(x)= \inf_{\lambda\in \cH_X^*}\Vert \delta_x\Vert_{\cH^\perp}  
     \end{equation} 
 \end{remark}
 
@@ -844,7 +844,7 @@ To make this precise: enrich $X=\{x_1,\dots,x_n\}$ with another point $X_0=x$
 and define $u_0(\cdot)=-1$
 \[A=k(x_j,x_k)_{0\leq j,k\leq N}\]
 \begin{align*}
-    u^\intercal A u&=\sum_{j=0}^N\sum_{k=0}^N u_j(x)u_k(x)k(x_j,x_k)\\
+    u^\perp A u&=\sum_{j=0}^N\sum_{k=0}^N u_j(x)u_k(x)k(x_j,x_k)\\
     &\stackrel{u_0=-1}{=}k(x,x)-2\sum_{j=1}^Nu_j(x)k(x,x_j)+2\sum_{j=1}^N\sum_{k=1}^Nu_j(x)u_k(x)k(x_j,x_k)\\
     &\stackrel{\text{thm. \ref{thm:2.4}}}{=}P_X^2(x)
 \end{align*}
@@ -852,7 +852,7 @@ and define $u_0(\cdot)=-1$
 $A$ has $n+1$ non-negative real eigenvalues $\lambda_0\geq \lambda_1\geq \dots\geq \lambda_N\geq 0$.
 
 \begin{align*}
-    \lambda_N\Vert u\Vert_2^2\leq u^\intercal A u\leq \lambda_0\Vert u\Vert_2^2
+    \lambda_N\Vert u\Vert_2^2\leq u^\perp A u\leq \lambda_0\Vert u\Vert_2^2
 \end{align*}
 
 gives 
@@ -1005,9 +1005,9 @@ We know focus on positive definite kernels.
 \end{theorem}
 
 \begin{proof}
-    With $b=[k(x_,\cdot),\dots,k(x_k,\cdot)]^\intercal$ and $A_{i,j}=k(x_i,x_j)$, $i,j=1,\dots,N$ 
+    With $b=[k(x_,\cdot),\dots,k(x_k,\cdot)]^\perp$ and $A_{i,j}=k(x_i,x_j)$, $i,j=1,\dots,N$ 
     we have 
-    \[ Q(u)=k(x,x)-2 b^\intercal (x)u+u^\intercal A u.\]
+    \[ Q(u)=k(x,x)-2 b^\perp (x)u+u^\perp A u.\]
     The min is the solution of $Au=b$\remark{in the positive definite setup only!},
     which is fullfilled by $u=u^*(x)$.
 \end{proof}
@@ -1083,9 +1083,461 @@ $C_k(x)$ is well defined. Combining these bounds and taking the square root give
 the bound for the power function.
 \end{proof}
 
+\beginlecture{08}{02.05.24}
+
+Other interesting functionals:
+
+Derivatives: $\lambda(f)=\frac{\partial f }{\partial x_j}(x)$ \marginnote{This is what we will focus on for now} %TODO: FIX
+
+Integration: $\lambda(f)=\int_\Omega f(y)dy$\marginnote{This yields quasi monte carlo integration}%TODO: FIX
+
+Consider $\Lambda\subseteq \cH^*$ that generalizes the role of the point set $X$ and the associated $\delta_{x_i}$.
+
+\[\{(x_i,\lambda_i f)\}_{i=1}^N\]
+more general data instead of $\{(x_i,f(x_i))\}$.
+
+Dirichlet boundary value problem :
+\begin{eqnarray}\label{eq:008}
+    Lu&=f&\text{ on }\Omega\subset \R^d\\
+    u&=g&\text{ on }\partial \Omega\nonumber
+\end{eqnarray}
+
+with $L$ a linear differential operator.
+
+\dhighlight{Collocation} is a general approach that discretizes this by  
+%\begin{eqnarray*}\label{eq:009}
+%    Lu(x_j^{\Omega})&=f(x_i^{\Omega}) & x_j^{}\Omega}\in\Omega, &1\leq j \leq N^{\Omega}\\
+%    u(x_j^{\Gamma})&=g(x_j^{\Gamma}) & x_j^{\Gamma} \in\Gamma, &1 \leq j \leq N^{\Gamma}
+%\end{eqnarray*} 
+
+The exact solution $u^*$ of \ref{eq:008} solves \ref{eq:009}. 
+
+Consider $U\subseteq \cH$
+of dimension at least $N$. Let $u\in U$.
+
+Assume $\lambda_i\in\cH^*$ of the form $\lambda_i=\delta_{x_i}\circ D^{\alpha(i)}$. 
+Further assume that $\alpha(i)\neq\alpha(k)$ if $x_i=x_k$.
+
+Then the $\lambda_i$ are linearly independent on the native space of a p.d. kernel(Compare: Wendland). 
+
+We can proceed via \dhighlight{Hermite interpolation}. We assume $\{(x_i,\lambda_i f)\}_{i=1}^N,x_j\in\Omega,\lambda_j\in\Lambda$
+with $\Lambda=\{\lambda_1,\dots,\lambda_n\}$ linearly independent set of continuous linear functionals.
+
+\begin{eqnarray*}
+    u(x)=\sum_{j=1}^N a_j \lambda_j^{(j)}k(x_j,x) & x\in\R^d
+\end{eqnarray*}
+that satisfies 
+\begin{eqnarray*}
+    \lambda_j u = \lambda_j f & j=1,\dots,N & f\in \cH % TODO lambda_i?
+\end{eqnarray*}
+$\lambda_i^{(1)}$ indicates that the functional acts on the first argument of $k$.
+
+The LES has entries $A_{jk}\lambda_j^{(2)}\lambda_k^{(1)}k(x_k,x_j)$ for $j,k=1,\dots,N$.
+
+\begin{example}
+    Denote the centers of radial basis functions (RBFs) by $\xi_j$ and denote the data location 
+    $\underline{x_j}$.\marginnote{$\underline{x_j}$ is the multiindex, $x$ is the first entry: $\underline{x_j}=(x,y)$} Given  \[\{(\underline{x_j},f(\underline{x_j}))\}_{i=1}^p\] 
+    and 
+    \[\{(\underline{x_j},\frac{\partial f}{\partial x})(\underline{x_j})_{j=p+1}^N\}\]
+    Thus 
+    \[\lambda_j = \begin{cases}
+        \delta_{\underline{x_j}} & j=1,\dots,p\\
+        \delta_{\underline{x_j}}\frac{\partial }{\partial x} & j=p+1,\dots,N
+    \end{cases}\]
+    with $k(\underline{x_j},\underline{x_k})=\varphi(\Vert \underline{x_j}-\underline{x_k\Vert})$
+    \begin{eqnarray*}
+        u(\underline{x})=\sum_{j=1}^N a_j k(\cdot, \underline{x})&=\sum_{j=1}^p a_j k(\cdot, \underline{x})+\sum_{j=p+1}^N a_j \frac{\partial}{\partial \xi_1} k(\xi,\underline{x})\\
+        &=\sum_{j=1}^N a_jk(\xi_j,\underline{x})-\sum_{j=p+1}^N a_j \frac{\partial}{\partial x} k(\xi_j,\underline{x})
+    \end{eqnarray*}
+    since system matrix after ... $u$ into $\lambda_ju=\lambda_j f$\marginnote{CAREFUL: In this calculation a lot of stuff (everything with a non-constant index?) should have an underline? He added them inconsistently and often corrected himself, so I couldn't keep up. }
+    \[\begin{bmatrix}
+        K & K_\xi\\ K_x & K_{xx}
+    \end{bmatrix}\]
+    with $K_{jk}=K(\xi_k,x_j)=\varphi(\Vert \xi_k-x_j\Vert)$
+    and 
+    \begin{align*}
+        K_{\xi,jk}&=\frac{\partial \varphi}{\partial \xi}\varphi(\Vert \xi_k-x_j\Vert) = -\frac{\partial \varphi}{\partial x}(\Vert \xi_k-x_j\Vert)\\
+        K_{x,jk}&=\frac{\partial \varphi}{\partial x}(\Vert \xi_k,x_j\Vert) \\
+        K_{xx,jk}&=\frac{\partial^2\varphi}{\partial x^2}(\Vert \xi_k,x_j)
+    \end{align*}
+\end{example}
+
+
+\begin{aremark}
+    We can do everything we did, but replacing point evaluations with point evaluations of
+    (weak) derivatives to get a similar theory weak derivatives, without relying on point evaluations.
+\end{aremark}
+
+To measure errors we use generalized power functions 
+\[P_\Lambda(\mu)=\Vert\mu_\mu\circ\Pi_\Lambda\Vert_{\cH^*}\]
+where we use $\mu\in\cH^*$ to measure the error instead of 
+point evaluation functionals
+\[\mu(f-f_\lambda)=(\mu-\mu\circ\Pi_\Lambda)f.\]
+
+\begin{eqnarray*}
+    Lu&=f & \Omega\subseteq\R^d\\
+    u&=g&\gamma=\partial\Omega
+\end{eqnarray*}
+with kernel based collocation method. 
+
+We use 
+\begin{equation}\label{eq:010}
+    u(x)=\underbrace{\sum_{j=1}^p a_j k(x_j,x)}_{\text{boundary } B}+\underbrace{\sum_{j=p+1}^N a_j L^{(1)}k(x_j,x)}_{\text{interior }I}
+\end{equation}
+
+$X=B\cup I$.
+
+We get a block matrix 
+\[A=\begin{bmatrix}
+    K & L^{(1)}K\\
+    L^{(2)}K & L^{(2)}L^{(1)}K 
+\end{bmatrix}\]
+where $Au=\begin{bmatrix}
+    g\\f
+\end{bmatrix}.$
+% Kernel differentiability factor 2 of what we want for the function space?
+
+with 
+\[\begin{cases}
+    \\
+    
+\end{cases}  \]
+\begin{eqnarray*}
+    K_{j,k} &= k(x_j,x_k) & x_j,x_k\in B\\
+    L^{(1)}K_{j,k} &=L^{(1)}K(\tilde{x}_k,x_j)&x_j\in B \tilde{x}_k\in I \\
+    L^{(2)}K_{j,k} &=L^{(1)}K(x_k,\tilde{x}_j)&x_k\in B \tilde{x}_j\in I \\
+    L^{(2)}L^{(1)}K_{j,k} &= L^{(2)}L^{(1)}K(\tilde{x}_k,\tilde{x}_j) & \tilde{x}_j,\tilde{x}_k\in U
+\end{eqnarray*}
+
+Same structure as for Hermite interpolation: Non-singular if 
+$\delta_{x_i}K,LK$ are linearly independent holds for suitable $K$. %TODO: Check matrix or kernel
+
+\begin{theorem}\label{thm:1.32}
+    Let $\Omega\subseteq \R^d$ be a polygonal and open domain. Let $L$
+    be a second order elliptic differential operator with coefficients 
+    ch $C^{2(k-2)}(\bar{\Omega})$ that either vanishes on $\partial \Omega$ or have no zero here.
+
+    Suppose that $k\in C^{2k}(\R^d\times\R^d)$ is a positive definite kernel. Assume 
+    that $Lu=f$ in the system \ref{eq:008} has a unique solution $u\in \mathcal{N}_k(\Omega)$
+    for some $f\in C(\Omega,g\in C(\Gamma))$. Let $\hat{u}$ be the approximation \ref{eq:010}. Then 
+    \[\Vert u-\hat{u}\Vert_{L_\infty(\Omega)}\leq C h_{I,\Omega}^{k-2}\Vert u\Vert_{\mathcal{N}_k(\Omega)}\]
+    and 
+    \[\Vert u-\hat{u}\Vert_{L_\infty(\partial\Omega)}\leq C h_{B,\partial\Omega}^k \Vert u\Vert_{\mathcal{N}_k}\]
+\end{theorem}
+
+\begin{proof}[Sketch of the proof]
+
+    For interior essentially as before for  $L(u)-L\hat{u}$ and 
+    $LLk$ is p.d. for p.d. $k$.
+
+\end{proof}
+
+\beginlecture{09}{07.05.24}
 
 
 
+\section{Kernel Methods for prediction}\beginlecture{10}{14.05.24}
+
+\begin{aremark}
+    Statistics: finding structure in the data, while ML tries to use the same math to make predictions
+\end{aremark}
+
+\begin{definition}\label{def:43}
+    Let $\Omega,\Sigma$ be a measurable space and $Y\subseteq\R$ be a closed subset. 
+    Denote by $(x,y,f(x))\in\Omega\times Y\times \R$ the triplet consisting of 
+    \dhighlight{attributes (or features)} $x$, an \dhighlight{observation} $y$ and a \dhighlight{prediction} $y$.
+    
+    A function $l:\Omega\times Y\times \R\to [0\infty)$ is called a \dhighlight{loss function} if it is 
+    measurable and $l(x,y,y)=0$ holds for all $x\in\Omega,y\in Y$.
+\end{definition}
+
+\begin{example}
+    \begin{itemize}
+        \item $l_2$ loss, which relates to the mean 
+        \item $l_1$ loss, which relates to the median
+        \item $l_H=\begin{cases}
+            \frac{1}{2}\xi^2 & |\xi|\leq \sigma\\
+            \sigma |\xi|-\frac{1}{2}\sigma^2 & \text{otherwise}
+        \end{cases}$ hubert loss
+        \item $l_\epsilon(\xi)=\max(|\xi|-\epsilon,0)\eqqcolon |\xi|_\epsilon$ $\epsilon$-sensitive loss
+    \end{itemize}
+    Weighting loss functions might be useful to emphasize important data points!
+    For Classification:
+    \begin{itemize}
+        \item $l(x,y,f(x))=\begin{cases}
+            0 & y=f(x)\\
+            1 & \text{otherwise}
+        \end{cases}$
+        \item $l(x,y,f(x))=\begin{cases}
+            0 & y=\text{sgn}(f(x))\\
+            1 & \text{otherwise}
+        \end{cases}$
+        \item $l(x,y,f(x))=l_1(1+\exp(-y f(x)))$ logistic loss, relates to probability
+        \item soft margin / hinge loss $\max(1-yf(x),0)$, important for SVMs \marginnote{much of the past research efforts where focused on SVMs}
+    \end{itemize}
+\end{example}
+
+\begin{aremark}
+    $l_1,l_2$ losses penalize overestimation in classification problems, therefore the other losses might be a better idea.
+    
+    Both hinge loss and logistic loss functions give a way to rank the data.
+\end{aremark}
+
+\begin{definition}\label{def:44}
+    Let $l:\Omega\times Y\times \R\to[0,\infty)$ be a loss function and $\mathbb{P}$ be a probability measure 
+    on $\Omega\times Y$. Then, for a measurable function $f:\Omega\to\R$, the \dhighlight{expected $l$-risk} is defined by 
+    \[R_{l,p}(f)\coloneqq \int_{\Omega\times Y} l(x,y,f(x))d\bP(x,y)=\int_\Omega\int_Y l(x,y,f(x))d \bP(y|x)d\bP_\Omega(x).\]
+\end{definition}
+
+For a given data set $D\coloneqq\{x_j,y_j\}_{j=1}^N$ with $x_j\in \Omega,y_j\in Y$ we can define 
+the empirical measure 
+\[P_{\text{imp}}(x,y)=\frac{1}{N}\delta_{x_j,y_j}\]
+
+\begin{definition}\label{def:45}
+    The \dhighlight{empirical l-risk} of a function $f_\Omega\to\R$ is defined as 
+    \[R_{l,\text{emp}}(f)=\int_{\Omega\times Y} l(x,y,f(x))d P_{\text{imp}}(x,y)=\frac{1}{N}\sum_{j=1}^N l(x_j,y_j,f(x_j))\]
+\end{definition}
+
+\begin{aremark}
+    Regularization via penalty terms or by enforcing some sparsity condition on the $\alpha_j$.
+\end{aremark}
+
+We will assume that $R_{l,\text{emp}}(f)$ is continuous on $f$. \marginnote{Operator inversion lemma}
+
+\[R_{l,\text{reg}}(f)=R_{l,\text{emp}}(f)+\lambda s(f)\]
+Here, the smoothness or sparsity is enforced by the regularization term $s$.
+
+Often $s$ is convex. The regularization parameter $\lambda$ balances 
+the empirical error and the regularization.
+
+\begin{theorem}[Representer theorem]\label{thm:46}
+    Let $s:[0,\infty)\to\R$ be a strictly monotone increasing function, $\Omega$ 
+    be a set, $\cH$ a RKHS over $\Omega$ and let $l:\Omega\times Y \times \R$ he a continuous loss 
+    function. Then, for given data $D=\{(x_j,y_j)\}_{j=1}^N,x_j\in\Omega,y_j\in Y$ and 
+    $\lambda>0$, each minimizer $f\in\cH$ of the regularized empirical risk 
+    \[R_{l,\text{reg}}(f)=\frac{1}{N}\sum_{j=1}^N l(x_k,y_j,f(x_j))+\lambda s(\Vert f\Vert_\cH)\]
+    admits a representation $f(x)=\sum_{j=1}^N \alpha_j k(x_j,x)$,
+    that is $f\in \cH_X,X=\{x_1,\dots,x_N\}$.
+\end{theorem}
+
+\begin{proof}
+    w.l.o.g. we assume $s(\Vert f\Vert_\cH)=\overline{s}(\Vert f \Vert_\cH)$.
+
+    We decompose any $f\in\cH$ into $f_X\in\cH_X$ and $f_{X^\perp}\in \cH_{X^\perp}$ (Theorem \ref{thm:1.17})
+    \[f=f_X+f_{X^\perp}=\sum_{j=1}^N \alpha_j k(x_j,x)+f(x)_{X^\perp}\]
+    We know 
+    \begin{align*}
+        \langle f_{X^\perp},k(x_k,\cdot)\rangle_\cH=0
+    \end{align*}
+    with the reproduction equation we write 
+    \[f(x_i)=\langle f,k(x_i,\cdot)\rangle_\cH = \sum_{j=1}^N \alpha_j k(x_i,x_j)+\langle f_{X^\perp},k(x_i)\rangle_\cH=\sum_{j=1}^N \alpha_j k(x_i,x_j)\]
+
+    The loss term part does not depend on $f_{X^\perp}$. Further, for all $f_{X^\perp}$ it holds 
+    \[s(\Vert f\Vert_\cH)=\overline{s}(\Vert f\Vert_\cH^2+\Vert f_{X^\perp}\Vert^2)\geq \overline{s}(\Vert f_X\Vert_cH^2)\]
+    Therefore for any fixed $\alpha\in\R^N$ the objective is minimal if $f_{X^\perp}=0$. This has to hold 
+    for any minimizer $f$.
+
+\end{proof}
+
+\begin{remark}
+    $f+q$, $f\in\cH$, $q\in \text{span}\{\varphi_p\}$ For this setup a corresponding 
+    representer theorem does hold. 
+\end{remark}
 
 
+\begin{remark}
+    If both loss function and $s$ are convex, one has a single minimum.
+\end{remark}
+
+Consider regularized least squares regression,
+\[R_{l_2,\text{reg}}(f)=\frac{1}{N}\sum_{j=1}^N (f(x_j)-y_j)^2+\frac{\lambda}{2}\Vert f\Vert_\cH^2\]
+where $f(x)=\sum_{j=1}^N \alpha_j k(x_j,x)$.
+
+\begin{align*}
+    \frac{1}{N}\sum_{j=1}^N\left(\sum_{k=1}^N \alpha_k k(x_k,x_j)-y_j\right)^2 +\frac{\lambda}{2}\sum_{j,k=1}^N \alpha_j\alpha_k k(x_j,x_k)
+\end{align*}
+derivation w.r.t. $\alpha_k$ yields:
+\begin{align*}
+    \frac{2}{N}\sum_{j=1}^N \left(\sum_{k=1}^N \alpha_k k(x_k,x_j)-y_j\right)k(x_k,x_j) +\frac{\lambda}{2}\sum_{j=1}^N \alpha_j(x_j,x_k)
+\end{align*}
+All together for all $a_k$ this holds and gives 
+\begin{align*}
+    0&=\frac{2}{N}K(K\alpha-Y)+\frac{\lambda}{2}K \alpha\\
+    \implies & K(K+\lambda N I)\alpha = KY \\
+    \implies & (K+\lambda N I)\alpha = Y
+\end{align*}
+
+\beginlecture{11}{16.05.24}
+
+In $L^2(\Omega)$ we have $\langle f,g\rangle=\int_\Omega fgdx$.
+We aim to write $\langle f,g\rangle_\cH=\langle Sf,Sg\rangle_{L^2(\Omega)}=\int_{\Omega}Sf(x)\cdot Sg(x)dx$,
+where $S$ is called a \dhighlight{regularization operator}.
+
+\begin{definition}\label{def:47}
+    A \dhighlight{regularization operator} $S$ is defined as a linear map 
+    from the space of functions \[\{f\mid f:\Omega\to \R\}\] into 
+    a space $D$ equipped with a scalar product. The regularization 
+    term $s(f)$ takes the form\marginnote{sometimes we multiply $\frac{1}{2}$ to $s$} \[s(f)\coloneqq \langle S(f),S(f)\rangle_D.\]
+\end{definition}
+
+\begin{remark}
+    Since we can always define $\tilde{S}=(S^*S)^{\frac{1}{2}}$ and 
+    \[\langle f, S^*S f\rangle_D=\langle Sf,Sf\rangle_D\]
+    we can assume $S$ is a positive semidefinite (regularization) operator.
+\end{remark}
+
+\begin{definition}\label{def:48}
+    Let $k:\Omega\times\Omega\to\R$ be continuous, $\Omega$ be a compact domain,
+    $\nu$ be a Borel measure and $L_2^{\nu}(\Omega)$ be the Hilbert space of square integrable functions on $\Omega$.
+    
+    We define the \dhighlight{integral operator} $T_k:L_2^\nu(\Omega)\to L_2^\nu(\Omega)$ by 
+    \[T_k(f)(\cdot)=\int_\Omega k(x,\cdot)f(x)d\nu\]
+    and we call $k$ the kernel of $T_k$.
+\end{definition}
+
+Mercer kernels 
+\[K(x,y)=\sum_{i=1}^\infty \lambda_j\phi_j(x)\phi_j(y)\]\marginnote{Fredhom integration operator of the second kind}
+with eigenvalues $\lambda_j$ and eigenfunctions $\phi_j$ w.r.t. the eigenproblem
+\[\langle k(x,\cdot),\phi\rangle_\sigma=\int_\Omega k(x,y)\phi(x)\sigma(x)dx=\lambda\phi(y)\iff (T_k\phi)(y)=\lambda\phi(y)\]
+\begin{definition}\label{def:49}
+    Given a linear ... or partial differential operator $\mathcal{L}$ on $\Omega\subseteq\R^d$, the %TODO
+    \dhighlight{Green's kernel} $g$ of $\mathcal{L}$ is defined as the solution of 
+    \[\mathcal{L}(g)(x,z)=\delta(x-z)\]
+    $\int f(z)\delta(x-z)dx=f(x)$.
+\end{definition}
+
+The Green kernel is not uniquely defined this way, so one adds 
+homogenous boundary conditions e.g. $g(x,z)=0$ for $x\in\partial\Omega$,
+$\lim_{\Vert x\Vert \to\infty} g(x,z)=0$.
+
+Solutions of $\mathcal{L}u=f$ with appropriate boundary conditions can 
+now be given as 
+\[u(x)=\int_\Omega g(x,z)f(z)dz\]
+Check 
+\begin{align*}
+    \mathcal{L}u(x)&=\mathcal{L}\int_\Omega g(x,z)f(z)dz\\
+    &=\int_\Omega \mathcal{L}g(x,z)f(z)dz\\
+    &=\int_\Omega \delta(x-z)f(z)dz=f(x)
+\end{align*}
+
+We can ... %TODO
+
+\[Gf(x)=\int_\Omega g(x,z)f(z)dz\]
+as the ``inverse'' of the differential operator $\mathcal{L}$, i.e.
+\[\mathcal{L}u=f\iff u=Gf\]
+
+\begin{example}[Brownian Bridge kernel]
+    $\Omega=[0,1]$, consider bvp (boundary value problem)
+    \[-u''(x)=f(x),u(0)=0=u(1)\]
+    The corresponding Green's kernel is 
+    \[g(x,z)=\min(x,z)-xz=\begin{cases}
+        x(1-z) & x\leq z\\
+        z(1-x) & x\geq z
+    \end{cases}\]
+
+    We an observe that for $g$ it must hold
+    \[\mathcal{L}g(x,z)=0\] for $x\neq z$, $z$ fixed. 
+    \begin{itemize}
+        \item $g(0,z)=g(1,z)=0$
+        \item $g$ is continuous along the diagonal $x=z$
+        \item for fixed $z\in (0,1)$ one observes for $\frac{dg}{dx}$ a jump disc. at $x=z$ of the form \marginnote{There is a further connection to the Brownian bridge of stochastic analysis? Not just the end points}
+        \[\lim_{x\to z^-}\frac{dg}{dx}(x,z)=1+\lim_{x\to z^+}\frac{dg}{dx}(x,z)\]
+    \end{itemize} 
+\end{example}
+
+\begin{remark}
+    Whenever $\mathcal{L}$ is a self adjoint differential operator, 
+    the corresponding Green's kernel is symmetric and the integral operator $G$ is 
+    self adjoint. 
+\end{remark}
+
+\begin{theorem}\label{thm:50}\marginnote{The second statement is much more interesting, the first follows from $S=\text{Id}$}
+    For every RKHS $\cH$ with reproducing kernel $k$ there exists a corresponding regularization operator 
+    $S:\cH\to D$ s.t. for all $f\in\cH$
+    \begin{equation}\label{eq:010}
+        f(x)=\langle Sk(x,\cdot),Sf(\cdot)\rangle_D
+    \end{equation}
+    In particular \[\langle S k(x,\cdot),Sk(y,\cdot)\rangle_D=k(x,y)\]
+    likewise, for every regularization operator $S:\mathcal{F}\to D$, where $\mathcal{F}$ is some 
+    function space equipped with a scalar product and with corresponding Green's kernel 
+    $f$ on $S^*S$, %TODO
+    there exists a corresponding RKHS $\cH$ with reproducing kernel $K$, s.t.
+    both equations are fulfilled.
+\end{theorem}
+
+\begin{proof}
+    First direction: $S=\text{Id},D=\cH$.
+
+    Second direction: 
+
+    \begin{align*}
+        f(x)&=\langle f,\delta(x-z)\rangle_{\mathcal{F}}=\langle f,\mathcal{L} g_x\rangle_{\mathcal{F}}=\langle f, S^*S g_{x}\rangle_{\mathcal{F}}=\langle Sf,Sg_x\rangle_{D}
+    \end{align*}
+    for all $f\in S^*S\mathcal{F}$, where $g_x$ is the Green's kernel for 
+    $S^*S$ and natural boundary conditions. Further we have with $f=g_z$
+    \begin{align*}
+        g_z(x)=\langle S g_x, Sg_z\rangle=\langle S g_z, S g_x\rangle=g_x(z)
+    \end{align*}
+
+    In this sense $g$ is symmetric and we write 
+    \[k(x,z)=g_z(x).\]
+
+    We observe that $x\to S g_x$ is actually a feature map,
+    i.e. $\langle S g_x,S g_z\rangle_D$. Since kernels
+    arising from feature maps result in Gram matrices for the kernel matrix 
+    we set that $K$ is a p.s.d..
+
+    It can be seen that the corresponding RKHS is the closure of 
+    \[\{f\in S^* S\mathcal{F}\mid \Vert Sf\Vert_D^2 <\infty\}\]
+
+\end{proof}
+
+To simplify, we consider the full space kernel, i.e. 
+without boundary  / decay conditions. For $g_z(x)=k(x,z)$, $g$ for the differential operator
+$\mathcal{L}$, we observe 
+\begin{align*}
+    \mathcal{L}\int_\Omega k(x,z)\sigma(x) dx&=\mathcal{L}\lambda\lambda \phi(z)\\
+    \iff \underbrace{\int_\Omega \delta(x-z)\phi(x)\sigma(x)dx}_{\phi(z)\sigma(z)}&=\lambda\mathcal{L}\phi(z)\\
+    \implies \dots & \implies L\phi(z)=\frac{1}{\lambda}\phi(z)\sigma(z)
+\end{align*}
+
+For simplicity we assume that $\mathcal{L}$ has no Eigenvalue $0$.
+
+\begin{example}
+    We have $\int_\Omega k(x,z)\phi(x)\sigma(x)dx=\lambda\phi(z)$
+    with $\sigma=1,k(x,z)=\min(x,z)-xz$ on $\Omega=[0,1]$.
+
+    This gives
+    \[\int_0^z x\phi(x)dx+\int_z^1 z\phi(x)dx-\int_0^1 xz\phi(x)dx=\lambda\phi(z)\]
+
+    Now apply $\mathcal{L}=-\frac{d^2}{dz^2}$ to the equation:
+    \begin{align*}
+        \frac{d}{dz}\left(z\varphi(z)-\int_1^z \phi(x)dx-z\phi(z)-\int_0^1x\phi(x)dx\right)&=\lambda \phi''(z)\\
+        \iff \frac{1}{\lambda}\phi(z)&=\phi''(z)
+    \end{align*}
+
+\end{example}
+
+\begin{theorem}\label{thm:51}
+    Given a regularization operator $S$ with an expansion of $S^*S$ into a 
+    discrete normalized eigendecomposition with eigenvalues and eigenfunctions $ \gamma_i,\phi_i$, we define
+    a kernel with 
+    \[k(x,y)=\sum_{i,\gamma_i\neq 0}\frac{d_i}{\gamma_i}\phi_i(x)\phi_i(z)\] 
+    where $d\in\{0,1\}$ for all $i$ and $\sum_{i=1}^\infty\frac{d_i}{\gamma_i}$ is ... %TODO 
+    Then $k$ satisfies theorem \ref{thm:50}
+    \[\langle Sk(x,\cdot),Sk(z,\cdot)\rangle_D=k(x,z)=\langle k(x,\cdot),k(z,\cdot)\rangle_\cH\]
+    where the RKHS is given by $\text{span}\{\phi_i|d_i=1\}$
+\end{theorem}
+
+
+\begin{proof}
+    \begin{align*}
+        \langle Sk(x,\cdot),Sk(z,\cdot)\rangle &=\langle k(x,\cdot),S^*Sk(z,\cdot)\rangle\\
+        &=\langle\sum_i \frac{d_i}{\gamma_i}\phi_i(x)\phi_j(\cdot),S^*S\sum_i \frac{d_i}{\gamma_i}\phi_i(x)\phi_j(\cdot)\rangle\\
+        &=\sum_{j,k}\frac{d_j}{\gamma_j}\frac{d_k}{\gamma_k}\phi_j(x)\phi_k(z)\langle \phi_j(\cdot),\underbrace{S^*S\phi_k(\cdot)}_{\gamma_k\phi_k}\rangle\\
+        &\stackrel{\text{ONB}}{=}\sum_{j}\frac{d_j}{\gamma_j^2}\gamma_j\phi_j(x)\phi_j(z)=k(x,z)
+    \end{align*}
+
+    From the construction of $k$ follows the statement of the span.
+\end{proof}
 
