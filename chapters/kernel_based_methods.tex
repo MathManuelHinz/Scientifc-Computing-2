@@ -1541,3 +1541,109 @@ For simplicity we assume that $\mathcal{L}$ has no Eigenvalue $0$.
     From the construction of $k$ follows the statement of the span.
 \end{proof}
 
+\beginlecture{12}{28.05.24}
+
+\section{Model selection}
+
+To estimate the predictive performance of a learned model, we use train- and test/ validation data.
+Where $D_t,D_V$\marginnote{80/20, 70/30 are common splits, this does depend on the size of the dataset!} are the training and the validation data sets, respectively. 
+The \dhighlight{empirical risk} on $D_V$ is used to measure the generalization performance.
+
+In case of hyperparameters, a simple strategy is to use a selection of hyperparameters, train models, and 
+pick the hyperparameters with the best empirical risk.\marginnote{Might not be the best idea in practice, where training may take weaks! Notice how the run time scales exponetially in the number of hyperparameters}
+
+\begin{aremark}
+    For time series data a random split might be bad (if there is a drift), therefore we might prefer taking years up to year x!
+\end{aremark}
+
+\begin{aremark}
+    If we use hyperparameter search, we also have to split the data into 3 parts. One for training, 1 for hyperparameter search and one to estimate the predictive power.
+\end{aremark}
+
+If the number of data is small, the measured performance on the validation data can have a large uncertainty. A 
+strategy to use is $k$-fold cross validation.
+
+We use $k$ disjoint equally sized subsets, use each one once for $D_V$ and the $k-1$ other ones as 
+training data $D_t$. The average performance over the $k$ runs is then the performance measure.
+
+\begin{aremark}
+    In the deep learning setting run the same training with different seeds, then take the average.
+\end{aremark}
+
+For $k=N$ is known as \dhighlight{leave-one-out} cross validation.
+
+%Definition in the script
+
+\begin{definition}\label{def:52}
+    There is a exact definition in the script (this was not done in the lecture).
+\end{definition}
+
+\begin{definition}\label{def:53}
+    A \dhighlight{Gaussian process} is a collection of random variables,
+    any finite number of which have a joint Gaussian distribution.
+
+    Mean $m(x)=\bE(f(X))$ and covariance $k(x,z)=\bE((f(x)-m(x))(f(z)-m(z)))$
+    \[f(x)=\text{GP}(m(x),k(x,z))\]
+\end{definition}
+
+Key example: Gaussian kernel:
+\[\cov(f(x),f(z))=k(x,z)=\exp(-\frac{1}{2\sigma^2}\Vert x-z\Vert^2)\]
+
+\begin{aremark}
+    We can then sample from this space of functions! The better fitted the space is to our data, the better our predictions.
+\end{aremark}
+
+Choose $X_*\coloneqq\{x_1,\dots,x_N\}$ and generate a random process with a covariance matrix
+\[f_*=\cN(0,k(X_*,X_*))\]
+Consider noisy data with additive gaussian noise $\epsilon$, with variance $\sigma_N^2$;
+\[y=f(x)+\epsilon\]
+
+The prior on the noisy observations becomes \[\cov(y_p,y_q)=k(x_p,x_q)+\sigma_N^2\delta_{pq}.\]
+or \[\cov(Y)=k(X,X)+\sigma_N^2I\]
+
+Joint distribution of observed target and $f$ at test locations
+\begin{align*}
+    \begin{bmatrix}
+        y\\f_*
+    \end{bmatrix}\sim\cN\left(0,\begin{bmatrix}
+        k(x,x)+\sigma_N^2I & k(x,x_*)\\
+        k(x_*,x) & k(x_*,x_*)
+    \end{bmatrix}\right)
+\end{align*}
+
+We need to restrict this joint distribution to contain only those functions that ``agree''
+with the observed data.
+
+\[f_*\mid X,Y,x_*\sim \cN\left(k(x_*,X)[k(X,X)+\sigma_N^2I]^{-1}Y,k(x_*,x_*)-k(x_*,X)[k(X,X)+\sigma_N^2I]^{-1}k(X,x_*)\right)\]
+
+Boil down to one evaluation $x_l$ we have
+\[f(x_l)=k(X,x_l)^\intercal(k(X,X)+\sigma_n^2I)^{-1}Y=\sum_{i=1}^N \alpha_i k(x_i,x_l)\]
+\[V(f)=k(x_l,x_l)-k(X,x_l)^\intercal[k(X,X)+\sigma_N^2I]^{-1}k(X,x_l)\]
+\begin{aremark}
+    What is a length scale? Variance in data points?
+\end{aremark}
+
+Consider the marginal likelihood or evidence 
+\[p(Y\mid X)=\int \underbrace{p(Y\mid f,X)}_{\text{likelihood}}\underbrace{p(f\mid X)}_{prior}df\]
+
+One can obtain for the log marginal likelihood 
+\[\log(p(Y\mid X))=-\frac{1}{2}Y^\intercal (K+\sigma_N^2)^{-1}Y\frac{1}{2}\log(K+\sigma_N^2I)-\frac{N}{2}\log(2\pi)\]
+
+$\theta$ hyperparameters of K:
+\[\log(p(Y\mid X,\theta))=-\frac{1}{2}\underbrace{Y^\intercal (K_\theta+\sigma_N^2)^{-1}Y}_{\text{data fit}}\underbrace{\frac{1}{2}\log(K_\theta+\sigma_N^2I)}_{\text{complexity penalty}}-\underbrace{\frac{N}{2}\log(2\pi)}_{\text{Normalization parameter}}\]
+One aims to optimize the evidence of the data, in this Bayesian optimization one can also include the hyperparameters.
+
+\begin{aremark}
+    Bayesian optimization. Optimize which data point would minimize unexplained variance?
+\end{aremark}
+
+
+$k(x,y)=\sum_{i=1}^\infty\gamma_i\phi_i(x)\phi_i(y)$ a mercel kernel. For $f\in \cH_K$
+\[f(x)=\sum_{i=1}^\infty c_i \phi_i(x)\]
+\begin{align*}
+    \langle f,f\rangle_{\cH_K}=\langle Sf, Sf\rangle_{L^2}=\langle f,Sf\rangle_{L^2}=\sum_{i=1}^\infty \frac{c_i^2}{\gamma_i}<\infty
+\end{align*}
+
+The rough terms $\phi_i$ have smaller prior variance and are therefore more strongly penalized
+by the regularization.
+
