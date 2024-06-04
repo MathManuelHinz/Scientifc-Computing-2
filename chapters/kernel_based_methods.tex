@@ -1647,3 +1647,115 @@ $k(x,y)=\sum_{i=1}^\infty\gamma_i\phi_i(x)\phi_i(y)$ a mercel kernel. For $f\in 
 The rough terms $\phi_i$ have smaller prior variance and are therefore more strongly penalized
 by the regularization.
 
+\beginlecture{13}{04.06.24}
+
+\begin{aremark}
+    \begin{itemize}
+        \item Motivation: Finding a classifier, specifically by separating data by a hyperplane!
+        \item Idea for SVMs: find a separating hyperplane while maximizing the margin between the hyperplane and the data points.
+        \item Outliers or not linearly separable data is a problem!
+        \item For SVMs slack variables can be a good idea to counteract some of those problems (where $C$ is another regularization parameter)
+        \item We can also use feature maps to embed our data into a higher dimensional space, where it might be linearly separable
+        \item Not a unique way to choose such a feature map
+        \item Sadly the number of support vectors in linear in the number of data points
+    \end{itemize}
+\end{aremark}
+
+\begin{align*}
+    \xi_i\geq 1-y_i(\langle w_i,\Phi(x_i)\rangle+b),\text{ } & \xi_i\geq 0\\
+    \xi_i\geq \max(0,y_i(\langle w_i,\Phi(x_i)\rangle+b))&\\
+    &=l_h(y_i,\langle w_i,\Phi(x_i)\rangle+b)
+\end{align*}
+
+It is therefore related to the hinge loss!
+
+$(w,b)$:
+\begin{align*}
+    f_{(w,b)}(x)&=\langle w,\Phi(x)\rangle+b\\
+    \min_{(w,b)}\underbrace{\langle w,w\rangle}_{\Vert f\Vert_{\cH}} &+ C\sum_{i=1}^N l_h(y_i,\langle w_i,\Phi(x_i)\rangle+b)
+\end{align*}
+
+
+This gives the RKHS view on SVMs.
+
+This, once more, motivates 
+
+\[k(x,y)=\langle \Phi(x),\Phi(y)\rangle\]
+
+\begin{align*}
+    \Vert \Phi(x)-\Phi(y)\Vert^2&=\langle\Phi(x),\Phi(x)\rangle-2\langle\Phi(x),\Phi(y)\rangle+\langle\Phi(y),\Phi(y)\rangle\\
+    &=k(x,x)-2k(x,y)+k(y,y)
+\end{align*}
+
+Shifting data: $x\mapsto x-t$, $\Vert x-y\Vert^2$ is invariant under the shift, but 
+$\langle x,y\rangle$ is not!\marginnote{There was a mistake here in the lecture!}
+\begin{align*}
+    \langle x-t,y-t\rangle & = \langle x,y\rangle-\langle x,t\rangle-\langle t,y\rangle+\langle t,t\rangle\\
+    &=\frac{1}{2}\left(\langle x,x \rangle -2\langle x,t\rangle +\langle t,t\rangle+\langle y,y\rangle-2\langle y,t\rangle+\langle t,t\rangle+2\langle x,y\rangle-\langle x,x\rangle - \langle y,y\rangle\right)\\
+    &=\frac{1}{2}\left(\Vert x-t\Vert^2+\Vert y-t\Vert^2-\Vert x-y\Vert^2\right)\\
+    &\sim \tilde{k}(x,y)
+\end{align*}
+
+This $\tilde{k}(x,y)=\langle x-t,y-t\rangle$ is still psd.
+
+
+\[\sum_{j,k} a_ja_k\langle x_j-t,x_k-t\rangle = \Vert \sum_{j}c_j(x_k-t)\Vert^2\]
+
+So, for any choice of $t\in\R$ we get a similarity measure $\tilde{K}(x,y)$ associated with the dissimilarity measure $\Vert x-y\Vert$
+
+
+Now replace $\langle \cdot,\cdot\rangle$ by $k$.
+
+\begin{lemma}\label{lem:54}
+    Let $t\in\Omega$ and $K$ be a symmetric kernel on $\Omega\times\Omega$. Then $\tilde{k}(x,y)=\frac{1}{2}(k(x,y)-k(x,t)-k(t,y)+k(t,t))$
+    is positive semidefinite if and only if $K$ is cond. psd. of order 1.
+
+    If $k(t,t)\leq 0$, then 
+    \[\hat{K}(x,y)\coloneqq \frac{1}{2}(k(x,y)-k(x,t)-k(t,y))\]
+    is psd iff $K$ is cpsd. of order 1.
+\end{lemma}
+
+\begin{proof}
+    1. $\tilde{k}$ psd $\implies K$ cpsd:
+
+    Let $a\in\R^n$ s.t. $\sum a_i=0$ and let $(x_i)_{i=1}^N$, then 
+    \begin{align*}
+        0\leq \sum_{i,j=1}^N a_ia_j \tilde{k}(x_i,x_j)=\sum_{i,j} \sum_{i,j=1}^N a_ia_j k(x_i,x_j)
+    \end{align*}
+    Since \[\sum_j a_j\underbrace{\sum_i a_i k(x_i,t)}_{=c}=0\]
+
+    2. $K$ cpsd. $\implies \tilde{k}$ psd.:
+
+    Let $a\in\R^n$, $(x_i)_{i=1}^N$, let $x_0=t,a_0=-\sum_{i=1}^Na_i$.
+    Then \[0\leq \sum_{i,j=1}^N a_ia_j k(x_i,x_j)=\sum_{i,j=1}^N a_ia_j \tilde{k}(x_i,x_j)\]
+    Thus $\tilde{k}$ is psd.
+\end{proof}
+
+If we take negative square distance, here $\sum_{i}a_i=0$ implies 
+\[-\sum_{i,j} a_ja_k \Vert x_j-x_i\Vert^2=-\sum_{j}a_j\sum_{k}\Vert x_k\Vert^2-\sum_{k}a_k\sum_{j}\Vert x_j\Vert^2+-\sum_{j}a_j\sum_{k}\langle x_j,x_k\rangle\]
+so $-\Vert x-y\Vert$ is cpsd. 
+
+Therefore kernels that are cspd. of order 1 are sometimes called negative definite kernels for $-K$.
+
+From Mercers theorem we have that $\tilde{k}$ (psd) has a feature map $\phi:\Omega\to\cF$, $\tilde{k}(x,y)=\langle \Phi(x),\Phi(y)\rangle$.
+Therefore $\Vert \Phi(x)-\Phi(y)\Vert^2 = \tilde{k}(x,x)+\tilde(k)(y,y)-2\tilde(k)(x,y)$.
+For fixed $t\in\R$\marginnote{$t\in\cF$ prob. ???} we use the definition of $\tilde{k}$.
+
+\begin{align*}
+    \Vert \Phi(x)-\Phi(y)\Vert^2&=\frac{1}{2}(k(x,x)-k(x,t)-k(t,x)+k(t,t)+k(y,y)-k(y,t)-k(t,y)+k(t,t)-2(k(x,y)-k(x,t)-k(t,y)+k(t,t)))\\
+    &=-k(x,y)+\frac{1}{2}(k(x,x)+k(y,y))
+\end{align*}
+
+This shows
+
+\begin{theorem}\label{thm:55}
+    Let $k$ be a cspd kernel of order 1 on $\Omega$. Then there exists a Hilbert space 
+    $\cF$ and a mapping $\Phi:\Omega\to\cF$ s.t. 
+    \[-k(x,y)+\frac{1}{2}(k(x,x)+k(y,y))=\Vert \Phi(x)-\Phi(y)\Vert_{\cF}^2\]
+    If $k(x,x)=0$ for all $x\in\Omega$, we have \[k(x,y)=-\Vert \Phi(x)-\Phi(y)\Vert_{\cF}^2\]
+    and $\sqrt{-k(x,y)}$ is a semi-metric and a metric if $k(x,y)\neq 0$ for $x\neq y$. 
+\end{theorem}
+
+
+
+
