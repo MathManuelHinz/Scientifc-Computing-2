@@ -1,0 +1,83 @@
+\begin{aremark}
+    Idea: High dimensional data $Y\to$ find low dimensional data $X$ which represents $Y$ to a good degree.
+
+    For example: Represent vectors w.r.t. to a subset of the basis!
+\end{aremark}
+
+Set $Y$ of $y_i\in\R^d$, $i=1,\dots,N$\marginnote{We are now in the unsupervised setting}
+goal is to find 
+\[x_i\in\R^p, p\ll d\]
+$d$ is called the \dhighlight{extrinsic} dimension, while $p$ is the \dhighlight{intrinsic} dimension.
+
+\section{Linear dimensionality reduction}
+
+$\{y_i\}_{i=1}^N$ are samples of a random variable $Y(\omega)\in\R^d$\marginnote{He writes $Y\in\R^d$, which seems to be the wrong space for a random variable \dots}.
+We assume $Y$ stems from $p$ unknown latent variables $X(\omega)\in\R^p$ by a linear transformation $W$.
+\[Y=WX\]
+which can be read as a statement about vectors (a single realization of the random variable) or in terms of matrices (the sampled realizations as a whole)-
+
+We assume that $Y,X$ are mean centered, i.e. $\bE(Y)=0$. We further assume 
+$W$ to be an axis change, i.e. the columns $w_i$ of $W$ are orthogonal to each other and unit norm:
+\[W^\intercal W = I_p\]
+We write the data in matrix form\marginnote{with slightly abusive notation, as the matrix $Y$ consists of $N$ samples of the random variable $Y$} 
+\[Y=\begin{bmatrix}
+    \vert &&\vert\\
+    y_1 & \dots & y_N\\
+    \vert &&\vert
+\end{bmatrix}\]
+
+For any $W$, consider the pseudo inverse 
+\[W^\dagger = (W^\intercal W)^{-1}W^\intercal=W^\intercal\]
+and therefore 
+\[X_i=W^T y_i.\]
+We aim for a good reconstruction of $Y$ by $X$:
+\begin{align*}
+    &\bE(\Vert y-W(W^T y)\Vert_2^2)\\
+    &=\bE(y^\intercal y-2y^\intercal W W^\intercal y+y^\intercal W W^\intercal W W^\intercal y)\\
+    &=\bE(y^\intercal y-y^\intercal WW^\intercal y)
+\end{align*}
+where 
+\begin{align*}
+    \bE(Y^\intercal WW^\intercal \underbrace{Y}_{\in\Omega\times\R^d})&\approx\frac{1}{N}\sum_{i=1}^N y_i^\intercal W W^\intercal y_i\\
+    &=\frac{1}{N}\text{tr}(Y^\intercal W W^\intercal \underbrace{Y}_{\in \R^{d\times N}})\\
+    &=\frac{1}{N}\text{tr}(W^\intercal YY^\intercal W)
+\end{align*}
+
+Adding the constraint, we set the lagrangian 
+\[\mathcal{L}=\text{tr}(W^\intercal YY^\intercal W)+\tr(I_p-W^\intercal W)\Lambda\]
+where $\Lambda=\lambda^T\in\R^{p\times p}$.
+
+Conditions for an extrema:
+\begin{align*}
+    (\star):YY^\intercal W = W\Lambda\implies \lambda=W^\intercal YY^\intercal W
+\end{align*}
+The objective reduces to $\tr(\Lambda)$. We can rotate $W$ and have the same \dhighlight{reconstruction error},
+i.e. we can use $W'=WR$ giving $\Lambda'=R\Lambda R^T$ for some rotation matrix $R$.
+$\implies \Lambda=\Lambda^T$ is diagonalizable with orthogonal matrices, so we choose $R$ s.t. 
+$\Lambda'$ is diagonal, w.l.o.g. $\Lambda$ is diagonal.
+
+From $(\star)$ follows that the columns of $W$ must be eigenvectors of $YY^\intercal$ with 
+corresponding eigenvalues as the diagonal of $\Lambda$. Since we maximize $\tr(\Lambda)$, we 
+take the $p$ largest eigenvalues of $YY^\intercal$ and the corresponding eigenvectors.
+
+SVD of $Y$: $U\Sigma V^\intercal$, we take the first $p$ columns of $U$ for $W$, i.e. $W=UI_{d\times p}$.
+Furthermore, as $U$ is orthogonal,
+\[X=W^\intercal Y=W^\intercal W^\intercal U \Sigma V^\intercal=I_{p\times d}\Sigma V^\intercal.\]
+Using $\Lambda=W^\intercal U\Sigma^2 U W$, we get 
+\[\tr(\Sigma^2)-\tr(I_{p\times d}\Sigma^2)=\sum_{i=p+1}^d \sigma_i^2=\sum_{i=p+1}^d \lambda_i\]
+
+\begin{theorem}\label{thm:2.1}
+    Let $Y=[y_1,\dots,y_N]\in\R^{d\times N}$ be a matrix of zero mean data points. Denote the SVD of 
+    $Y$ by $Y=U\Sigma V^\intercal$. Then for given $p<d$, the minimizer $W$ for 
+    \[\min_{\stackrel{W}{W^\intercal W=I_p}}\sum_{i=1}^N\Vert y_i-WW^\intercal y_i\Vert_2^2\]
+    is given using $W=[u_1,\dots,u_p]$. The lower dimensional embedding is given by 
+    $X=I_{p\times d}\Sigma V^\intercal=I_{p\times d}U^\intercal Y$ and the \dhighlight{reconstruction error} 
+    is \[\sum_{i=p+1}^N\sigma_i^2\]
+\end{theorem}
+
+
+
+
+
+
+

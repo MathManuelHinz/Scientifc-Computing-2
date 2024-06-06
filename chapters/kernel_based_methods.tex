@@ -1756,6 +1756,48 @@ This shows
     and $\sqrt{-k(x,y)}$ is a semi-metric and a metric if $k(x,y)\neq 0$ for $x\neq y$. 
 \end{theorem}
 
+\beginlecture{14}{06.06.24}
 
+Consider the 
 
+\[F[f](\omega)=\frac{1}{(2\pi)^{-d/2}}\int_{\R^d}f(x)\exp(-i\langle x,\omega\rangle)dx\]
 
+and the \dhighlight{inverse Fourier transform} 
+\[F^{-1}[f](x)=\frac{1}{(2\pi)^{-d/2}}\int_{\R^d}f(\omega)\exp(i\langle i,\omega\rangle)\]
+where
+\[f(x)=F^{-1}[F[f]](x)\]
+Consider $S$, where $S^*$ is diagonalizable on th Fourier basis.\marginnote{Consider the regularization operator ...}
+
+Denote $v(\omega)$ a nonnegative, symmetric function on $\R^d$:
+\[v(\omega)=v(-\omega)\geq 0\]
+further assume $v(\omega)\to0$ for $\Vert\omega\Vert\to\infty$ and denote by 
+$\Omega$ the support of $v$.
+\begin{align*}
+    \langle Sf,Sg\rangle_D=(2\pi)^{\frac{d}{2}}\int_\Omega \frac{\overline{F[f](\omega)}F[g](\omega)}{v(\omega)}d\omega
+\end{align*}
+
+Small values of $v(\omega)$ correspond to strong damping of the corresponding frequencies.
+This is desirable for large $\omega$, i.e. high frequency components that correspond to 
+rapid changes in $f$.
+
+Now look at $g(x,z)=(2\pi)^{d/2}\int_\Omega e^{i\omega(x-z)}v(\omega)d\omega$. Let $f$
+have the support of its Fourier transform contained in $\Omega$. We see 
+\begin{align*}
+    \langle Sg(x,\cdot),Sf\rangle &= (2\pi)^{d/2}\int_\Omega \frac{\overline{F[g(x,\cdot)](\omega)}F[f](\omega)}{v(\omega)}d\omega\\
+    &=(2\pi)^{-d/2}\int_\Omega \frac{\overline{v(\omega)}\exp(i\langle x,\omega\rangle)F[f](\omega)}{v(\omega)}d\omega\\
+    &=(2\pi)^{-d/2}\int_\Omega \exp(i\langle x,\omega\rangle)F[f](\omega)d\omega=f(x)
+\end{align*}
+
+According to theorem \ref{thm:50} $g$ is the kernel corresponding to $S$.
+
+This is a special case of 
+\begin{theorem*}[Bocher's theorem]
+    For given $\kappa:\R^d\to\C$ the expression
+    \[k(x,y)=\kappa(x-y)\] defines a kernel if and only if there exists 
+    a unique finite Borel measure $\mu$ on $\R^d$ s.t.
+    \[\kappa(x)=\int_{\R^d}\underbrace{\exp(i\langle x,y\rangle)}_{\cos(\langle x,y\rangle)\text{ for the real case}}d\mu(y)\] 
+\end{theorem*}
+
+\begin{aremark}
+    random kitchen sink paper ... 20007
+\end{aremark}
