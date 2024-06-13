@@ -75,9 +75,290 @@ Using $\Lambda=W^\intercal U\Sigma^2 U W$, we get
     is \[\sum_{i=p+1}^N\sigma_i^2\]
 \end{theorem}
 
+\beginlecture{15}{11.06.24}
+
+To get compactness: Take a\dhighlight{ball of functions: $\Vert f\Vert<=r$} and use Ascella-Ascoli. % TOFIX
+
+
+\subsection{Alternative derivations of PCA}
+
+\begin{itemize}
+    \item Projection: We aim for $y=\sum_{i=1}^p x_i w_i$ with $y_i,w_i\in\R^d, w_i^\intercal,w_j=\delta_{ij}$. Then $x_i=\langle y_i,w_i\rangle$.
+    \item Approximation with rank constraints:\[\min_{A}\Vert Y-A\Vert_{F}^2\] s.t. rank $A=p$
+    \item From the statistical perspective: 
+\end{itemize}
+
+\begin{definition}\label{def:2.2}
+    Given a zero mean multivariate random variable $Y\in\Omega\times \R^d$. The $p$ \dhighlight{principle components} of $Y$
+    are defined as the $p$ uncorrelated linear components of $Y$:\[X_i=w_i^\intercal y\in\R,\text{ } w_i\in\R^d,\text{ }i=1,\dots,p\] s.t. the variance of $x_i$ maximized subject to $w_i^\intercal w_i=1$  and $\Var(x_1)\geq \Var{x_2}\geq\dots\geq \Var(x_p)$
+\end{definition}
+
+\begin{theorem}\label{thm:2.3}\marginnote{In the exercise we show that the greedy approach works in this specific setting?}
+    Assume that the rank of the covariance matrix $\bE(YY^\intercal)$ is larger than $p$. Then the first 
+    $p$ principle components of a zero mean, multivariate random variable $Y$, denoted by $x_i,i=1,\dots,p$ are given by 
+    \[x_i=w_i^\intercal Y\]
+    where $\{w_i\}_{i=1}^p$ are the $p$ orthonormal eigenvectors of $\bE(YY^\intercal)$ associated 
+    its $p$ largest eigenvalues $\{\lambda_i\}_{i=1}^p$. Moreover $\lambda_i=\Var(X_i)$.
+\end{theorem}
+
+\begin{aremark}
+    $Y$, which has $N$ columns and $d$ rows ... % BILD 
+\end{aremark}
+
+\begin{aremark}
+    In general we might want to work with tensors (for example if we have a time dependent structure). This is possible, but can be generalized 
+    in multiple, non-equivalent, ways. The sum of vectors representation is not so nice, there are counter examples ... 
+\end{aremark}
+
+We aim for embeddings that approximately preserve distances. \marginnote{Here, we always talk about euclidean distances!}
+\[d^d(y_1,y_2)\approx d^p(x_1,x_2)\]
+
+\begin{definition}\label{def:2.4}
+    A $N\times N$ symmetric matrix $D$ is called \dhighlight{Euclidean distance matrix (EDM)}, if there exists 
+    an integer $d>0$ and a vector set $Y=\{y_1,\dots,y_N\},y_i\in\R^d$, s.t. $D_{i,j}=d_E^2(y_i,y_j)$,\marginnote{Careful! Some authors use the euclidean distance matrix with a square, and some without the square!}
+    where $d_E$ is the euclidean distance. The vector set $Y$ is called the \dhighlight{configuration} of $D$. We write $D\in\text{EDM}$.
+\end{definition}
+
+\begin{definition}\label{def:2.5}
+    A $N\times N$ symmetric matrix $D$ with non-negative entries $d_{i,j}$ is called \dhighlight{distance matrix}, if $d_{ii}=0$ for all $i$ and 
+    \[\sqrt{d_{ij}}\leq \sqrt{d_{ik}}+\sqrt{d_{kj}}\]
+    for all $i,j,k$. We write $D\in \DM$. 
+\end{definition}
+
+Obviously $\EDM\subset\DM$.
+
+\[(\star)\text{ } d_E^2(y_i,y_j)=\underbrace{\langle y_i,y_i\rangle}_{G_{ii}}-2\underbrace{\langle y_i,y_j\rangle}_{G_{ij}}+\underbrace{\langle y_j,y_j\rangle}_{G_{jj}}\]
+where $G_{ij}=\langle y_i,y_j\rangle = (Y^\intercal Y)_{ij}$.
+
+As for PCA, we aim for mean centered data, where we use the centering matrix
+\[H=I-\frac{1}{N}1_N,\]
+where $1_W=1_N\cdot 1_N^\intercal$ is the matrix of all ones, where $1_N$ is the vector of all ones. %TODO: Fix 
+with \[Y^c=Y-(\frac{1}{N}Y1_N)1_N^{\intercal}=YH.\]
+We set the centered data. The centered Gram matrix
+\[G^c=(Y^c)^\intercal Y^c=H^\intercal Y^\intercal Y H =H^\intercal G H\]
+
+\begin{theorem}\label{thm:2.6}
+    For the Euclidean distance matrix $D$ and the centered Gram matrix $G1 c$ of a data set $Y$, it holds 
+    \[G^c=-\frac{1}{2}H D H\]
+\end{theorem}
+
+\begin{proof}
+    Straight forward calculation from $(\star)$.
+\end{proof}
+
+
+\begin{lemma}\label{lem:2.7}
+    Assume that the matrix $D\in\EDM$ and let $G^c=-\frac{1}{2} HDH$. If the rank of $G^c$ is $r$, then 
+    there is a centered $r$ dimensional configuration $Y=\{y_1,\dots,y_N\}\in\R^r$, s.t. $d_E(y_i,y_j)=d_{ij}$.
+\end{lemma}
+
+\begin{proof}
+    Since $D\in\EDM$, there exists a set $Z=\{z_1,\dots,z_n\}\in\R^d$, s.t. $d_{ij}=d_E(z_i,z_j)$,
+    $G^c$ is the Gram matrix of $Z$ and therefore psd. The rank is $r$, so we have $G^c=Y^\intercal Y$ with a centered 
+    data matrix (via EDM). The centered data satisfies $d_{i,j}=d_E(y_i,y_j)$. We call $r$ the \dhighlight{intrinsic configuration dimension} and 
+    $Y$ is the \dhighlight{exact configuration} of $D$.
+\end{proof}
+
+\subsection{(classical) multidimensional scaling (MDS)}
+
+Instead of exact configuration of dimension $r$, we seek a lower dimensional configuration $Y\subset\R^p$, $p<r$;
+\[X=\argmin_{X\subset\R^{p\times N}}\sum_{i,j}^N |d_{ij}^2-d_E^2(x_i,x_j)|\text{ } (\star\star)\]
+s.t. $X=T(Y)$, with $T$ an orthogonal projection from $\R^r$ to a $p$-dimensional space $S_p\subset\R^r$ and $Y$ is an exact configuration. 
+
+\begin{lemma}\label{lem:2.8}
+    Let $Z\subset\R^r$ be a given data set with $D_Z=[d_E^2(z_i,z_j)]_{i,j=1}^N$ and let $G_Z^c=-\frac{1}{2}HD_ZH$.
+    Then \[\tr(G_Z^2)=\frac{1}{2N}\sum_{i,j=1}^N d_E^2(z_i,z_j)\]
+\end{lemma}
+
+\begin{proof}
+    Write out $G_Z^2$, look at diagonal, straight forward calculation.
+\end{proof}
+
+\begin{lemma}\label{lem:2.9}
+    Let $D_Z$ as before. $ZH\eqqcolon\tilde{Z}=[\tilde{z}_1,\dots,\tilde{z}_n]$. Then $\Vert \hat{Z}\Vert_F=\frac{1}{\sqrt{2N}}\Vert D_Z\Vert_F$.
+\end{lemma}
+
+\begin{proof}
+    With $\Vert D_Z \Vert_F^2=\sum d_E^2(z_i,z_j)$ and $\Vert\hat{Z}\Vert_F^2=\tr(\hat{Z}^\intercal \hat{Z})=\tr(\hat{G_z^2})$. The result follows from lemma \ref{lem:2.8}.
+\end{proof}
+
+\begin{theorem}\label{thm:2.10}
+    Let $Y\subset\R^r$ be an exact configuration of $D\in\EDM$. The SVD of $Y$ is given by $U\Sigma V^\intercal$. For a given $p\leq r$, let 
+    $U_p=[u_1,\dots,u_p]$. Then 
+    \[X=U_p^\intercal Y\] 
+    is a solution of the MDS minimization problem $(\star\star)$ with an error of \[2N\sum_{i=p+1}^r\sigma_i^2.\]
+\end{theorem}
+
+
+\begin{proof}
+    Let $S_p$ be a $p$-dim subspace of $\R^r$. Let $B$ be a $r\times p$ orthogonal matrix, whose 
+    columns form an orthonormal basis of $S_p$. We have $T(y)=BB^\intercal y$ and observe 
+    \[d_E(B^\intercal y_i B^\intercal y_j)=\Vert B^{\intercal}(y_i-y_j)\Vert T(y_i-y_j)=d_E(Ty_i,Ty_j).\] 
+    Wih $\Vert y_i-y_j\Vert\geq \Vert T (y_i-y_j)\Vert$. We get for the objective function 
+    \begin{align*}
+        \sum_{i,j=1}^N d_E^2(y_i,y_j)-d_E^2(B^\intercal y_i,B^\intercal y_j)&=\sum_{i,j=1}^N \langle y_i-y_j,y_i-y_j\rangle-\langle B^\intercal (y_i-y_j),B^\intercal(y_i-y_j)\rangle\\
+        \stackrel{\langle B^\intercal y,B^\intercal y\rangle=\langle B^\intercal By, B^\intercal y\rangle}{=}&\dots - 2 \langle BB^\intercal (y_i-y_j),(y_i-y_j)\rangle + \langle BB^\intercal (y_i-y_j),(y_i-y_j)\rangle\\
+        &=\sum_{i,j=1}^N \vert (I-BB^\intercal)(y_i-y_j)\vert^2=\Vert D_Z\Vert_F^2
+    \end{align*}
+    wih $Z=(I-BB^\intercal)Y$. Using Lemma \ref{lem:2.9}, we get $\Vert D_Z\Vert_F^2=2N\Vert ZH\Vert_F^2=2N\Vert Z\Vert_F^2$, 
+    since $Y$ is centered $Z$ is also centered. Therefore we have to solve 
+    \[\argmin_{\stackrel{B\in\R^{r\times p}}{B^\intercal B=I_p}}\Vert Y-BB^\intercal Y\Vert_F.\]
+    Again we use Schmidt-Eckart-Yanns for the SVD. THe matrix $U_p \Sigma_pV_p^\intercal$ ??? So getting $B=U_p$ gives 
+    \[U_pU_p^\intercal U\Sigma V^\intercal  = U_p\Sigma_pV_p^\intercal\] and 
+    $X=U_p^\intercal Y$. The error estimate follows from ??? SVD and Lemma \ref{lem:2.9}.
+\end{proof}
+
+It is important to understand the flip: You can choose the minimum of the number of dimensions and the number of data points.
+
+\beginlecture{16}{13.06.24}
+
+Recap:
+
+$G^c=Y^\intercal Y=(W^\intercal X| W X)=X^\intercal W^\intercal W X = X^\intercal X$
+
+EVD of $G^c$:\marginnote{EVD= Eigen value decomposition}
+\begin{align*}
+    G^c=V\Lambda V^\intercal &= (V \Lambda^{\frac{1}{2}})(\Lambda^{\frac{1}{2}} V^\intercal)\\
+    &=(\Lambda^{\frac{1}{2}} V^\intercal)^\intercal (\Lambda^{\frac{1}{2}} V^\intercal)
+\end{align*}
+
+Taking the top $p$ eigenvalues gives 
+\[X_{\text{MDS}}=I_{p\times N}\Lambda^{\frac{1}{2}}V^\intercal\]
+Also $Y=U\Sigma V^\intercal$ for PCA:
+\begin{align*}
+    X_{\text{PCA}}&=I_{p\times d} U^\intercal Y = I_{p\times d} \Sigma V^\intercal\\
+    &=I_{p\times d} (\Sigma^\intercal \Sigma)^{\frac{1}{2}}V^\intercal=I_{p\times d}\Lambda^{\frac{1}{2}}V^\intercal
+\end{align*}
 
 
 
+We can use the following approaches:\marginnote{The SVD is most commenly used and ist most stable. If you have extreme differences in $d$ and $N$, it might be worth to use on of the other two approaches}
+
+\begin{itemize}
+    \item SVD of $Y$: $(d\times N)$: Reconstruct $Y$
+    \item EVD of $YY^\intercal$ $(d\times d)$: maximal variance 
+    \item EVD of $Y^\intercal Y$ $(N\times N)$: preserving similarity 
+\end{itemize}
 
 
+\begin{algorithm}[H] % TODO: FIx numbering
+    \caption{MDS}\label{alg:mds}
+ \textbf{Input:} EDM $D,P$\\
+ \textbf{Output:} embedding $X$ in $p$ dimensions
+ \begin{algorithmic}
+   \State $G=-\frac{1}{2} H D H$
+   \State $[V_p,\Lambda_p]=\text{EVD}(G,p)$
+   \State Return $\Lambda_p^{\frac{1}{2}} V^\intercal$
+ \end{algorithmic}
+\end{algorithm}
 
+\begin{aremark}
+    There are multiple generalizations!
+\end{aremark}
+
+\subsection{Strange effects in high dimensions}
+
+\subsubsection*{Angles}
+
+First we look at angles between vectors. In 2d the angle between the diagonal and an axis is $\frac{\pi}{4}$.
+
+In general: 
+\[\varphi=\arccos\frac{\langle x,y\rangle}{\Vert x\Vert\Vert y\Vert}\]
+Then $\alpha=\frac{1}{\sqrt{d}}$.
+
+\subsubsection*{Volume}
+
+The volume of the hypersphere in $d$ dimensions:
+\[\frac{r^d\pi^{\frac{d}{2}}}{\Gamma(1+\frac{d}{2})}\]
+The Volume of the hypercube is $(2r)^d$.
+
+Therefore in higher dimensions the sizes of a unit hypersphere and its bounding hypercube are not close, their ratio goes to $0$!
+\subsubsection*{Concentration of measure}
+If we increase the radius of the sphere by just some small $\epsilon$, we can see that most of the mass 
+lies in the outer shell of hyperspheres!
+\[\frac{V_{r} }{V_{r(1-\epsilon)}}=\frac{1}{(1-\epsilon)^d}\]
+\subsubsection*{Curse of dimensionality}\marginnote{If we do datascience in higher dimensions, we always implicitly assume that there is more structure, otherwise most problems would not be feasable}
+The higher the dimension, the more points I need to approximate functions of the same complexity as the dimension increases. This scaling is exponential!
+Therefore we need lots of data to recover functions in higher dimensions.
+\subsubsection*{ANOVA decomposition}
+However the dimensions might be highly correlated! We can than use the ANOVA decomposition:
+\[f(x)=\sum_{\tilde{d}_i={1,\dots,D}} f_{\tilde{d}_i}(x_{\tilde{1}},\dots,x_{\tilde{p}})\]
+
+\subsection{Properties in dimensionality reduction approaches}
+
+\begin{enumerate}
+    \item Estimate the intrinsic dimensionality
+    \item What kind of properties of the original data does one (implicitly or explicitly) assume to hold and to approximately preserve
+    \item One often aims for latent variable separation (statistical independence, orthogonality)\footnote{this is also useful for interpretability!}
+\end{enumerate}
+
+For PCA/MDS, we can consider the rank of the matrix as the intrinsic dimensionality.\marginnote{This assumes no noise, otherwise we can be reasonably sure that the intrinsic dimensionality is smaller than the rank}
+
+We can use criteria such as 
+\[\frac{\sum_{i=1}^p\lambda_i}{\sum_{i=1}^d\lambda_i}\geq 0.95\]
+or 
+\[\lambda_{p+1} \leq 0.01\sum_{i=1}^d \lambda_i\]
+
+Another procedure: The $L$-curve: Linearly approximate the eigenvalues as a function of the index from both the left and the right and take the intersection as the cutoff point.
+
+In the latter approaches we assume a fast decline in eigenvalues.
+
+\section{nonlinear dimensionality reduction}
+
+We use manifolds instead of linear subspaces. Ideally we use geodesic distances $d_M(x,y)$ and 
+preserve $d_M$ in the embedding. But both $M$ and $d_M$ are unknown, only 
+$D\subset M$ is given. 
+
+\dhighlight{Approach:} Build an undirected neighborhood graph $[Y,E]$ and use the graph distances $d_G$
+instead of $d_M$ and aim to preserve it.
+
+\begin{definition}\label{def:11} % TODO: Footnote not in colorbox
+    Given a graph $[Y,E]$ for a data set $Y\subset\R^d$, s.t. $(y_i,y_j)\in E$ if and only if $y_i,y_j$ are adjacent\footnote{in some geometric senes}. 
+    We define the \dhighlight{graph distance $d_G$} between two points $y_i,y_j\in Y$ by 
+    \begin{enumerate}
+        \item If $(y_i,y_j)\in E$ then $d_G(y_i,y_j)=d_E(y_i,y_j)$
+        \item If $(y_i,y_j)\not\in E$ then let $\Gamma\{\gamma\mid \gamma=(\gamma_0,\dots,\gamma_s),\gamma_i\in Y, \gamma_0=y_i,\gamma_s=y_j\}$ and define 
+        \[d_G(y_i,y_j)=\min_{\gamma\in\Gamma} \sum_{i=0,\dots,s-1}d_E(\gamma_i,\gamma_{i+1})\]
+    \end{enumerate}
+\end{definition}
+
+We assume $Y\subset M\subset \R^d$ and that an isometric\marginnote{isometric means distance preserving} mapping 
+\[f:M\to\R^p\]
+exists $f(y)=x$ for $y\in M$ and \[d_E(f(y_i),f(y_j))=d_M(y_i,y_j)\]
+for all $y_i,y_j\in M$.
+
+Assume $Y$ is sampled densely enough from $M$, we expect that \[d_G(y_i,y_j)\approx d_M(y_i,y_j).\]
+
+$D_G=[d_G^2(y_i,y_j)]_{i,j=1}^N$, we aim for $D\in\EDM$, with a configuration $X\in\R^p$ s.t. 
+$D_G\approx D=[d_E^2(x_i,x_j)]_{i,j=1}^N$.
+
+\begin{algorithm}[H] % TODO: FIx numbering
+    \caption{Isomap}\label{alg:isomap}
+ \textbf{Input:} Dataset  $Y$, $p$\\
+ \textbf{Output:} data set embedding $X$ in $p$ dimensions
+ \begin{algorithmic}
+    \State Build a neighborhood graph $[Y,E]$
+    \State $D_{ij}=[d_E^2(x_i,x_j)]$ using Dijkstra's algorithm 
+    \State $G=-\frac{1}{2} H D H$
+    \State $[V_p,\Lambda_p]=\text{EVD}(G,p)$
+    \State Return $\Lambda_p^{\frac{1}{2}} V^\intercal$
+ \end{algorithmic}
+\end{algorithm}
+
+Assume $D_G\in\EDM$ we can invoke the MDS theorem \ref{thm:2.10}. We get 
+\[\sum_{,j=1}^N \vert d_G^2(y_i,y_j)-d_E^2(x_i,x_j)\leq 2 N \sum_{l=p+1}^N \lambda_l.\] 
+
+For the analysis we will use $r$-ball graphs: 
+
+$(y_i,y_j)\in E\iff \Vert y_i-y_j\Vert_E\leq r$.
+
+Furthermore we use the Hausdorff distance between $Y$ and $M$
+
+\[\epsilon=H(M\mid Y)=\sup_{y\in M}\min_{y_i\in Y}\Vert y-y_i\Vert\]
+
+\begin{theorem}\label{thm:2.12}
+    Consider $M\subset\R^d$ compact and a sample $Y=\{y_1,\dots,y_N\}\subset M$ and let 
+    $\epsilon=H(M\mid Y)$. For $r>0$ form the corresponding $r$-ball graph. When $\epsilon\leq \frac{r}{4}$, we 
+    have for any $x,z\in Y$
+    \[d_G(x,z)\leq \left(1+\frac{4\epsilon}{r}\right)d_M(x,z)\] 
+\end{theorem}
