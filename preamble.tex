@@ -13,7 +13,7 @@
 \usepackage{xcolor}
 \usepackage{adjustbox}
 \usepackage{mathrsfs}
-\usepackage[chapter]{algorithm}
+\usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{marginnote}
 \usepackage{xhfill}
@@ -121,11 +121,11 @@
 \renewcommand{\theequation}{\arabic{equation}}
 
 
-\newtheorem{theorem}[algorithm]{Theorem}
-\newtheorem{corollary}[algorithm]{Corollary}
-\newtheorem{lemma}[algorithm]{Lemma}
-\newtheorem{proposition}[algorithm]{Proposition}
-\newtheorem{definition}[algorithm]{Definition}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
 \newtheorem*{*definition}{Definition}
 \newtheorem*{remark}{Remark}
 \newtheorem*{aremark}{Added remark}

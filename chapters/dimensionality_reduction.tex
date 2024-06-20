@@ -44,12 +44,12 @@ where
 \end{align*}
 
 Adding the constraint, we set the lagrangian 
-\[\mathcal{L}=\text{tr}(W^\intercal YY^\intercal W)+\tr(I_p-W^\intercal W)\Lambda\]
-where $\Lambda=\lambda^T\in\R^{p\times p}$.
+\[\mathcal{L}=\text{tr}(W^\intercal YY^\intercal W)+\tr((I_p-W^\intercal W)\Lambda)\]
+where $\Lambda=\Lambda^T\in\R^{p\times p}$.
 
 Conditions for an extrema:
 \begin{align*}
-    (\star):YY^\intercal W = W\Lambda\implies \lambda=W^\intercal YY^\intercal W
+    (\star):YY^\intercal W = W\Lambda\implies \Lambda=W^\intercal YY^\intercal W
 \end{align*}
 The objective reduces to $\tr(\Lambda)$. We can rotate $W$ and have the same \dhighlight{reconstruction error},
 i.e. we can use $W'=WR$ giving $\Lambda'=R\Lambda R^T$ for some rotation matrix $R$.
@@ -62,7 +62,7 @@ take the $p$ largest eigenvalues of $YY^\intercal$ and the corresponding eigenve
 
 SVD of $Y$: $U\Sigma V^\intercal$, we take the first $p$ columns of $U$ for $W$, i.e. $W=UI_{d\times p}$.
 Furthermore, as $U$ is orthogonal,
-\[X=W^\intercal Y=W^\intercal W^\intercal U \Sigma V^\intercal=I_{p\times d}\Sigma V^\intercal.\]
+\[X=W^\intercal Y=W^\intercal U \Sigma V^\intercal=I_{p\times d}\Sigma V^\intercal.\]
 Using $\Lambda=W^\intercal U\Sigma^2 U W$, we get 
 \[\tr(\Sigma^2)-\tr(I_{p\times d}\Sigma^2)=\sum_{i=p+1}^d \sigma_i^2=\sum_{i=p+1}^d \lambda_i\]
 
@@ -77,7 +77,7 @@ Using $\Lambda=W^\intercal U\Sigma^2 U W$, we get
 
 \beginlecture{15}{11.06.24}
 
-To get compactness: Take a\dhighlight{ball of functions: $\Vert f\Vert<=r$} and use Ascella-Ascoli. % TOFIX
+To get compactness: Take a\dhighlight{ball of functions: $\Vert f\Vert<=r$} and use Arzelà-Ascoli. % TOFIX
 
 
 \subsection{Alternative derivations of PCA}
@@ -90,7 +90,7 @@ To get compactness: Take a\dhighlight{ball of functions: $\Vert f\Vert<=r$} and 
 
 \begin{definition}\label{def:2.2}
     Given a zero mean multivariate random variable $Y\in\Omega\times \R^d$. The $p$ \dhighlight{principle components} of $Y$
-    are defined as the $p$ uncorrelated linear components of $Y$:\[X_i=w_i^\intercal y\in\R,\text{ } w_i\in\R^d,\text{ }i=1,\dots,p\] s.t. the variance of $x_i$ maximized subject to $w_i^\intercal w_i=1$  and $\Var(x_1)\geq \Var{x_2}\geq\dots\geq \Var(x_p)$
+    are defined as the $p$ uncorrelated linear components of $Y$:\[x_i=w_i^\intercal y\in\R,\text{ } w_i\in\R^d,\text{ }i=1,\dots,p\] s.t. the variance of $x_i$ maximized subject to $w_i^\intercal w_i=1$  and $\Var(x_1)\geq \Var(x_2)\geq\dots\geq \Var(x_p)$
 \end{definition}
 
 \begin{theorem}\label{thm:2.3}\marginnote{In the exercise we show that the greedy approach works in this specific setting?}
@@ -332,7 +332,7 @@ Assume $Y$ is sampled densely enough from $M$, we expect that \[d_G(y_i,y_j)\app
 $D_G=[d_G^2(y_i,y_j)]_{i,j=1}^N$, we aim for $D\in\EDM$, with a configuration $X\in\R^p$ s.t. 
 $D_G\approx D=[d_E^2(x_i,x_j)]_{i,j=1}^N$.
 
-\begin{algorithm}[H] % TODO: FIx numbering
+\begin{algorithm}[H]
     \caption{Isomap}\label{alg:isomap}
  \textbf{Input:} Dataset  $Y$, $p$\\
  \textbf{Output:} data set embedding $X$ in $p$ dimensions
@@ -362,3 +362,218 @@ Furthermore we use the Hausdorff distance between $Y$ and $M$
     have for any $x,z\in Y$
     \[d_G(x,z)\leq \left(1+\frac{4\epsilon}{r}\right)d_M(x,z)\] 
 \end{theorem}
+
+
+\beginlecture{17}{18.06.24}
+
+In practice we often choose $k$-nearest neighbors instead of $r$-ball neighborhoods!
+
+\begin{aremark}
+    CMDS is the same as MDS in our lecture. This is relevant for the sheets.
+\end{aremark}
+
+\begin{proof}
+    For $d_E(x,z)\leq r$ we have that $(x,z)\in E$ in the $r$-ball graph and so 
+    \[d_G(x,z)=d_E(x,z)\leq d_M(x,z).\]
+    Now consider $d_E(x,z)>r$ and let $a=d_M(x,z)$ and let $\gamma:[0,a]\to M$ be parametrized by 
+    arc length s.t. $\gamma(0)=x=y_{i_0}$ and $\gamma(a)=z=y_{i_s}$. Let $\hat{y}_{i_j}=\gamma\left(\frac{j a}{s}\right)$
+    for $j=0,\dots,s$ where $s=\lceil 2a/r\rceil\geq 2$, where $\hat{y}_0=a,\hat{y}_s=z$.
+    Let $y_j=\argmin_{y\in Y} d_E(y,\hat{y}_j)$. Clearly $\max_s d_E(y_{i,j}\hat{y}_j)\leq \epsilon$ for any $j=0,\dots,s-1$.
+    \begin{align*}
+        d_E(y_{i_j}, y_{i_{j+1}})&\leq d_E(y_{i_j},\hat{y}_j)+d_E(\hat{y}_j,\hat{y}_{j+1})+d_E(\hat{y}_{j+1},y_{i_{j+1}})\\
+        &\leq \epsilon +d_M(\hat{y_j},\hat{y}_{j+1})+\epsilon\\
+        &=a/s + 2\epsilon\leq r/2 + 2\epsilon< r
+    \end{align*}
+    Therefore $(y_{i_0},\dots,y_{i_s})$ forms a path in the $r$-ball graph.\marginnote{This might not be the shortest path in the graph}
+    \begin{align*}
+        d_G(x,z)&\leq \sum_{i=j}^{s-1} d_E(y_j,y_{j+1})\\
+        &\leq d_M(\underbrace{\hat{y}_0}_{=x},\hat{y}_1)+\epsilon + \sum_{j=1}^{s-2} d_M(\hat{y}_j,\hat{y}_{j+1})+2\epsilon+d_M(\hat{y}_{s-1},\underbrace{\hat{y}_s}_{=z})+\epsilon\\
+        &=d_M(x,z)+2(s-1)\epsilon\\
+        &\leq \left(1+\frac{4\epsilon}{r}\right)d_M(x,z)
+    \end{align*}
+    we use that $s-1\leq \frac{2a}{r}$ with $a=d_M(x,z)$.
+\end{proof}
+
+\begin{aremark}
+    Here we use that the subset of a shortest path is still a shortest path for the specific start and end points.
+\end{aremark}
+
+\begin{lemma}\label{lem:2.13}
+    Let $\gamma:[0,a]\to\R^d$ be a unit speed curve with curvature bounded by $\kappa$. Then $d_E(\gamma(s),\gamma(t))\geq \frac{2}{\kappa}\sin\left(\frac{\kappa|t-s|}{2}\right)$
+\end{lemma}
+
+\begin{proof}[Proof of a weaker statement]
+    Let $c$ denote the unit-speed parametrization of a circle of radius $\frac{1}{\kappa}$. From Darbins (1957) we obtain 
+    $|t-s|\leq \frac{\pi}{\kappa}$:
+    \[\langle \gamma(s), \gamma(t)\rangle \geq \langle c(s),c(a)\rangle\]
+    This leads to \begin{align*}
+        \Vert \gamma(t)-\gamma(s)\Vert \Vert \dot{\gamma}(s)&\stackrel{\text{C.S.}}{\geq}\langle \dot{\gamma(s)},\gamma(t)-\gamma(s)\rangle\\
+        & = \int_s^t\langle \dot{\gamma}(s),\gamma(u)\rangle du\\
+        &\geq \int_s^t\langle c(s),c(u)\rangle du\\
+        &=\langle c(s),c(t)-c(s)\rangle\\
+        &=\frac{1}{\kappa}\sin(\kappa\cdot(|t-s|))
+    \end{align*}
+    when $0\leq t-\leq \frac{\pi}{\kappa}$.
+
+    We now assume $M\subset \R^d$ is compact and connected $C^2$-manifold with empty or $C^2$-boundary. In particular, shortest path on $M$ have curvature bounded by some $\kappa$.
+\end{proof}
+
+\begin{lemma}\label{lem:2.14}
+    Suppose $M\subset \R^d$ has the above properties. Then for any $x,z\in M$ s.t. $d_M(x,z)\leq \frac{\pi}{\kappa}$
+    \begin{enumerate}
+        \item $d_M(x,z)\max\left(\frac{2}{\pi},1-\frac{\kappa^2}{24}d_M(x,z)^2\right)\leq d_E(x,z)\leq d_M(x,z)$. Moreover there is $\tau>0$ depending on $M$ s.t. for all $x,z\in M$ with 
+        $d_E(x,z)\leq \tau$ it holds
+        \item $d_E(x,z)\leq d_M(x,z)\leq d_E(x,z)\min\left(\frac{\pi}{2}+C_0\kappa^2d_E(x,z)^2\right)$ where $c_0$ is a constant that can be taken to be $c_0=\frac{\pi^2}{50}$.
+    \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+    For 1.:
+    
+    Take $x,z\in M$ and let $a=d_M(x,z)\leq \frac{\pi}{\kappa}$. Let $\gamma:[0,a]\to M$ be a unit-speed 
+    shortest path on $M$ s.t. $\gamma(0)=x,\gamma(a)=z$. By assumption $\gamma$ has curvature bounded by $\kappa$. Applying lemma \ref{lem:2.13} gives 
+    \[d_E(x,z)=d_E(\gamma(0),\gamma(a))\geq \frac{2}{\kappa}\sin\left(\kappa \frac{a}{2}\right)\geq \max\left(a-\frac{\kappa^2}{24}a^3,\frac{2}{\pi}a\right)\]
+    and $\sin(t)\geq t-\frac{t^3}{6},\sin(t)\geq \frac{2t}{\pi}\forall t\leq \frac{\pi}{2}$.
+
+    For 2.: by 1. $d_M(x,z)\leq \frac{\pi}{\kappa}$, then $d_M(x,z)\leq \frac{\pi}{2}d_E(x,z)$ and 
+    \begin{align*}
+        d_M(x,z)&\leq \frac{d_E(x,z)}{\left(1-\frac{\kappa^2}{24}d_M(x,z)^2\right)}\\
+        &\leq \frac{d_E(x,z)}{\left(1-\frac{\kappa^2}{24}\left(\frac{\pi}{2}d_E(x,z)\right)^2\right)}\\
+        &\leq d_E(x,z)(1+C_0\kappa^2 d_E(x,z)^2)
+    \end{align*}
+    where the last inequality holds if $\kappa d_E(x,z)$ is small enough. Therefore, it is enough to show that 
+    there is $\tau>0$ s.t. \[d_M(x,z)\leq \frac{\pi}{\kappa}\]
+    when $d_E(x,z)\leq \tau$. This is true, because the smoothness of $M$ guarantees that $d_M$  
+    be continuous as a function  of the compact set $M\times M$.
+\end{proof}
+\begin{theorem}\label{thm:2.15}
+    Suppose $M\subset\R^d$ has the above properties. Consider a sample $Y=\{y_1,\dots,y_m\}\subset M$. For $r>0$ from 
+    the corresponding $r$-ball graph. Let $c_0$ and $\tau$ be defined per lemma \ref{lem:2.14} and $\kappa r\leq \frac{1}{3}$. We have 
+    \[d_M(x,z)\leq (1+C_0\kappa^2r^2)d_G(x,z)\ \forall x,y\in Y\]
+\end{theorem}
+
+\begin{proof}
+    Fix $x,z\in Y$. Let $x=y_{i_0},\dots,z=y_{i_s}$ define a shortest path in the graph joining $x,z$, so that $d_G(x,z)=\sum_{j=0}^{s-1}\Delta_j$, where 
+    $\Delta_j=d_E(y_{i_j},y_{i_{j+1}})$. Define $a=d_M(x,z)$ and $a_j=d_M(y_{i_j},y_{i_{j+1}})$. 
+    Since $\Delta_j\leq r \leq \tau$ by lemma \ref{lem:2.14} we see 
+    \[\Delta_j\min\left(\frac{\pi}{2}\,c_0\kappa^2 \Delta_j^2 \right)\geq a_j.\]
+    By assumption, $\kappa r\leq \frac{1}{3}$, and this can be seen to imply $1+C_0\kappa^2 r^2\leq \frac{\pi}{2}$, which then implies that $a_j\leq \Delta_j+C_0\kappa^2\Delta_j^3$, we thus have 
+    \[a\leq \sum_{j=1}^{s-1} a_j\leq \sum_{j=0}^{s-1}(\Delta_j + C_0\kappa^2\Delta_j^3)\leq \sum_{j=0}^{s-1}\Delta_j (1+C_0\kappa^2r^2)=(1+C_0 \kappa^2 r^2)d_G(x,z)\qedhere\]
+\end{proof}
+
+\begin{aremark}
+    This is the justification for using Isomap. One should consider, that the assumptions are NOT always met in practice, which might result our algorithm to fail. In particular we don't know 
+    $M$ in practice, which makes our assumptions hard to check \dots
+
+    Luckily the assumptions are often met ``naturally''.
+\end{aremark}
+
+\subsection{Parallel transport unfolding}
+
+Underlying idea: % Bild 
+Systematically overestimating the distance (by doing unnecessary turns on the graph). We then think about the tangent spaces and try to 
+connect the local views of the tangent spaces. Main idea we find a better path (closer to the geodesic).
+
+\beginlecture{18}{20.06.24}
+
+We will now consider the computational ingredients using discrete parallel transport.
+We are using a $l$-nearest neighbor graph.
+\begin{enumerate}
+    \item Approximate tangent spaces: Take $q$-NN in the graph, $q\geq k$\marginnote{separate $k,q$ to avoid unwanted connection while still getting good approximations}, denoted \[\{\tilde{y}_{l}^i\}_{l=1}^q,\text{ }\hat{y}_l^i = \tilde{y}_l^i-y_i\ \hat{Y}^i=[\hat{y}_1^i,\dots,\hat{y}_q^i]\]\marginnote{The space spanned by the columns of $T_i$}The $p$ left singular vectors of $\hat{Y}^i$ to the $p$ largest singular values give an orthonormal basis for $T_i$, spanning tje approximate tangent space\[T_i=[t_1^i,\dots,t_p^i]\in\R^{d\times p}\]
+    \item Now given $y_o$\marginnote{$O(p)$ are the $p\times p$ orthogonal matrices} % TODO: FIX
+    and $y_j$ connected in $G$ \[R_{j,i}=\argmin_{R\in O(p)}\Vert T_i-T_jR\Vert_F \]
+    $R_{j,i}$ is the discrete metric connection between $y_i,y_j$, it best aligns $T_i,T_j$. By definition $R_{i,j}=R_{j,i}^{-1}=R_{j,i}^T$. With $T_i^TT_j=U\Sigma V^\intercal$ we can show $R_{j,i}=VU^T$.
+    \item  Consider $(y_i,y_j,y_k)$ and start w.l.o.g. $y_i$. The first edge \[l_i=y_j-y_i\]
+    is projected onto $T_i$: $v_i=T_i^\intercal e_i$.\marginnote{Projected in the $L^2$ sense}
+    We set $z_i=0$ and $z_j=z_i+v_i$ defines the first modified edge. Now, $e_j=y_k-y_i$ and $T_j^\intercal e_j$ is parallel transported 
+    into the tangent space at $y_i$\[v_j=R_{i,j}[T_j^\intercal e_j]\] and $z_k=z_j+v_j$%TODO: FIX
+    Under some assumptions 
+    \[\Vert v_i+v_j\Vert_2=d_E(z_i,z_k)\approx d_M(y_i,y_k)\]
+    \item For longer paths $y_{i_1},\dots,y_{i_m}$ we iteratively project the edges $l_{i_s}=y_{i_{s+1}}-y_{i_s}$ onto $T_{i_j}$ before parallel transporting back to $T_{i_1}$\[V_{i_s}=\left(\prod_{j=1}^{s-1} R_{i_j,i_{j+1}}\right)[T_{i_s}^\intercal l_{i_s}]\]
+    with $V=\sum_{j=1}^M v_{I_S}$ WE GET $\Vert v \Vert_2\approx d_M(y_1,y_{i_m})$
+\end{enumerate}
+\[(\star)\ 1-\xi \frac{d_G(y_i,y_j)}{d_M(y_i,y_j)}\leq 1+\xi\]
+We saw in PTU 
+\[\min_{R\in O(p)}\Vert Y^\intercal - X^\intercal R\Vert_F.\]
+Generally aligning two point sets using an orthogonal transformation is called \dhighlight{procrustes problem}.
+
+Pointwise:
+
+\[\min_{R\in O(p)}\sum_{i=1}^N\Vert y_i - Rx_i\Vert_2^2.\]
+
+Consider two configurations $X,Y$\marginnote{which stem from two different EDMs, which are somehow alligned / comparable}, given
+\[\Vert Y^\intercal Y-X^\intercal X\Vert_F=\epsilon^2\]
+and 
+\[\Vert X^\dagger\Vert_2\epsilon\leq \frac{1}{\sqrt{2}}\]
+it holds 
+\[\min_{R\in O(d)}\Vert Y^\intercal X^\intercal R\Vert_F\leq (1+\sqrt{2})\Vert X^\dagger\Vert_2 \epsilon^2\]
+
+For $D,\tilde{D}\in \EDM$ it holds using $\epsilon^2=\frac{1}{2}\Vert H(\tilde{D}-D)H\Vert_F$ a corresponding result.
+
+Using $(\star)$ for Isomap amd $X$ the exact embedding using $d_M$ into $\R^p$ one has 
+\[\min_{R\in O(p)}\left(\frac{1}{N}\sum_{i=1}^N\Vert z_i-R x_i\Vert^2\right)^{\frac{1}{2}}\leq \frac{36\sqrt{p}\rho^3}{w^2}\xi\]
+for $Z$ the approximate embedding and $\rho,w$ are singular values of our datamatrix:
+
+\[\rho=\rho(X)=\frac{\sigma_1(X)}{\sqrt{N}}\]
+radius of $X$ largest deviations along any direction in space.
+\[w=w(X)=\frac{\sigma_p(w)}{\sqrt{N}}\]
+half width of $X$, smallest deviations along any direction in space.
+
+\subsection*{Using kernels again ...}
+
+Nonlinear PCA
+
+Reminder: $C=\frac{1}{N}Y\cdot Y^\intercal=\frac{1}{N}\sum_{i=1}^N y_i\cdot _i^T$
+we consider some \dhighlight{feature map} $\phi:R^d\to\R^r\eqcolon \cF$
+For simplicity, we assume to be mean-centered on the feature space:
+\[\sum_{i=1}^N\phi(y_i)=0.\]
+Now, do PCA in $\cF$, $C_\phi=\frac{1}{N}\sum_{i=1}^N\phi(y_i)\phi(y_i)^\intercal = \frac{1}{N}\phi(Y)\phi(Y)^\intercal=\frac{1}{N}\Phi\cdot\Phi^\intercal$.
+
+EVD gives $C_\phi u_i=\lambda_i u_i$ and by theorem \ref{thm:2.3}  the nonlinear principal components are 
+\[X_i=u_i^\intercal \Phi.\]
+IGNORE:
+\[\Phi\Phi^\intercal\to \Phi^\intercal \Phi\]
+\[U^\intercal=V^\intercal \Phi^\intercal\]
+\[X=V^\intercal\Phi^\intercal \Phi=\Lambda^{-\frac{1}{2}}\Phi^\intercal \Phi=\Lambda^{-\frac{1}{2}}V^\intercal V \Lambda V^\intercal=\Lambda^{\frac{1}{2}}V^\intercal\]
+STOP IGNORING
+\[x_I=V^\intercal \Phi^\intercal\Phi(y_i)\]
+\[K_{i,j}=\langle \Phi(y_i),\Phi(y_j) \rangle_{\cF}\eqqcolon K(y_i,y_j)\]
+A projection of a point $y$ with image $\phi(y)$ gives 
+\begin{align*}
+    x&=V^\intercal \Phi^\intercal \phi(y)\\
+    &=\sum_{i=1}^N v_i\langle \phi(y_i),\phi(y)\rangle_{\cF}\\
+    &=\sum_{i=1}^N v_i K(y_i,y)
+\end{align*}
+
+This kernelized form we call \dhighlight{Kernel MDS}, but it is usually called 
+\dhighlight{Kernel PCA} in the literature.\marginnote{The interpretation step of PCA gets a lot harder. Especiially, since the feature maps are not unique \dots} 
+
+To consider non-centered data, we need to center it: 
+\[\tilde{\phi}(y_i)\coloneqq \phi(y_i)-\frac{1}{N}\sum_{j=1}^N\phi(y_j)\]
+with associated kernel $\tilde{K}$.
+\[\tilde{\Phi}(Y)=(\Phi^c(Y)-\frac{1}{N}\Phi(Y)1)1^\intercal = \Phi(Y)H\]
+Action of $H$ goes through the SP 
+\[\tilde{K}=K^c=HKH\]
+\begin{algorithm}[H] 
+    \caption{Nonlinear PCA}\label{alg:nl_pca}
+ \textbf{Input:}  nonlinear data set $Y$ $\phi:\R^d\to\R^r,p$\\
+ \textbf{Output:} configuration $X$ in $p\leq \min(r,N)$ dimensions
+ \begin{algorithmic}
+   \State $K=-H\Phi^\intercal(Y)\Phi H$
+   \State $[V_p,\Lambda_p]=\text{EVD}(K,p)$
+   \State Return $\Lambda_p^{\frac{1}{2}} V_p^\intercal$
+ \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H] 
+    \caption{Nonlinear MDS}\label{alg:nl_mds}
+ \textbf{Input:}  nonlinear data set $Y$, Kernel $K:\R^d\times\R^d\to\R$\\
+ \textbf{Output:} configuration $X$ in $p\leq N$ dimensions
+ \begin{algorithmic}
+   \State $K_{i,j}=K(y_i,y_j)$
+   \State $\hat{K}=HKH$
+   \State $[V_p,\Lambda_p]=\text{EVD}(\hat{K},p)$
+   \State Return $\Lambda_p^{\frac{1}{2}} V_p^\intercal$
+ \end{algorithmic}
+\end{algorithm}
+
