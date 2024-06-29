@@ -577,3 +577,319 @@ Action of $H$ goes through the SP
  \end{algorithmic}
 \end{algorithm}
 
+\beginlecture{19}{25.06.24}
+
+Connection of PCA and MDS (motivated by the kernelized versions):
+
+$X_{\text{PCA}}=I_{p\times d} U^\intercal Y=I_{p\times N}\Lambda^{\frac{1}{2}}V^\intercal$
+
+\subsection{A view on Kernel MDS embedding}
+
+$K=V\Lambda V^\intercal\iff V^\intercal K V = \Lambda$
+
+\begin{align*}
+    \lambda_i \delta_{i,j}&=V_i^\intercal L V_j=\sum_{l_1,l_2}^N V_{l_1,i} k(y_{l_1},y_{l_2}) V_{l_2,j}\\
+    &=\langle \sum_{l_1=1}^N V_{l_1,i} k (y_{l_1},\cdot),\sum_{l_2=1}^{N} V_{l_2,j} k(y_{l_2},\cdot)\rangle
+\end{align*}
+
+This tells uns that the 
+\[f_i(\cdot)=\frac{1}{\sqrt{\lambda_i}}\sum_{l=1}^N V_{l,i}k(y_{l_i},\cdot)\]
+is a orthonormal basis of $\cH_Y$ if rank$K=N$.
+
+The first $p$ $f_i(y)$ give an embedding into $\R^p$ of $y$.
+
+\begin{remark}
+    Let $\tilde{K}=HKH$. It can be seen that $\tilde{K}$ is psd iff $K$ is cpsd. The centering removes 
+    the dependence on the origin in the feature space.
+    Reminder: $G^c=-\frac{1}{2}HDH$, for comparison. We also considered negative distance as a cpsd kernel.
+\end{remark}
+
+\begin{remark}
+    Just using any kernel an actually increase the embedding dimension. Take the Gaussian kernel, it will give a matrix with full rank $N$.
+    Looking at the decay of EV of the kernel matrix shows a weak decay!     
+\end{remark}
+
+\subsection{Maximum Variance Unfolding}
+
+\begin{aremark}
+    he uses $\vert\vert\vert$ for matrix norms, while I still use $\Vert$!
+\end{aremark}
+
+\begin{enumerate}
+    \item Euclidean embedding space Gram matrix $K$ is to be computed, so a constraint is \highlight{$K\in$ SPSD}, i.e. the symmetric positive semi-definite matrices.
+    \item We use Kernel MDS and aim for a \highlight{centered} $K$. 
+    \item We want to \highlight{locally preserve distances}: Locally euclidean distances are ok \[d_E(y_i,y_j)=d_E(\phi(y_i),\phi(y_j))\]
+    \item We \highlight{maximize the variance} by maximizing the pairwise distance in the feature space for $y_i,y_j$ with $(y_i,y_j)\notin E$:\[\frac{1}{2N}\sum_{i,j=1}^Nd_E^2(\phi(y_i),\phi(y_j))\stackrel{\text{Lemma \ref{lem:2.8}}}{=}\tr(G_\phi^c)\]
+\end{enumerate}
+
+\begin{definition}\label{def:2.16}
+    Given a data set $Y$ and a neighborhood graph $[Y,E]$. The solution of 
+    \begin{eqnarray}
+        \max_{K\in\text{SPSD}} \tr(K)\text{ s.t. } \sum_{i,j}^N K_{ij}=0 \label{eq:2.1}
+    \end{eqnarray}
+    and with $(y_i,y_j)\in E$: $d_E^2(y_i,y_j)=K_{ii}-2K_{ij}+K_{jj}$ as a second condition,
+    where $\sum_{i,j}^N K_{ij}=0$ is the centering condition
+\end{definition}
+
+
+\begin{algorithm}[H] 
+    \caption{MVU}\label{alg:mvu}
+ \textbf{Input:}  data set $Y$, its pairwise distances, $p$\\
+ \textbf{Output:} Embedding in their $p$ dimensions
+ \begin{algorithmic}
+    \State Build their neighborhood graph $[V,E]$
+   \State Solve (\ref{eq:2.1}) to get $K$
+   \State $\hat{K}=HKH$
+   \State $[V_p,\Lambda_p]=\text{EVD}(K,p)$
+   \State Return $\Lambda_p^{\frac{1}{2}} V_p^\intercal$
+ \end{algorithmic}
+\end{algorithm}
+
+We can write the MVU problem also as 
+\begin{eqnarray}
+    \max_{D\in \EDM}\sum_{i,j=1}^N D{ij}\text{ s.t. }D_{ij}=d_E^2(y_i,y_j)\text{ for } (y_i,y_j)\in E\label{eq:2.2}  
+\end{eqnarray}
+
+\begin{theorem}\label{thm:2.17}
+    Let $C\subset\DM$ and $[Y,E]$ a data graph with weights $d_W$. If the graph is connected,
+    the following two constraint optimization problems are equivalent:
+    \begin{enumerate}
+        \item (\ref{eq:2.2})\[\max_{D\in \EDM}\sum_{i,j=1}^N D{ij}\text{ s.t. }D_{ij}=d_E^2(y_i,y_j)\text{ for } (y_i,y_j)\in E\]
+        \item \begin{equation}\min_{D\in C}\Vert D-D^G\Vert_1  \min_{D\in C}\sum_{i,j=1}^N\vert D_{ij}-D_{ij}^G\vert\label{eq:2.3}\end{equation} s.t. $D_{ij}=d_W(y_i,y_j)$ if $(y_i,y_j)\in E$
+            where $D_{ij}^G=d_G^2(y_i,y_j)$ is the (squared) graph distance matrix for the edge weights $d_W$. 
+    \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+    Let $D\in C$. Then for all $1\leq i,j\leq N$ and paths $\gamma\in[Y,E]$ connecting 
+    $y_i=\gamma_0,y_j=\gamma_{s+1}$ the triangle inequality implies 
+    \begin{align*}
+        \sqrt{D_{ij}}\leq \sum_{k=0}^s\sqrt{D_{\gamma_k\gamma_{k+1}}}=\sum_{k=0}^s\sqrt{d_W^2(\gamma_k\gamma_{k+1})}=\Vert\gamma\Vert =l
+    \end{align*}
+    In particular this holds for the shortest paths between $y_i,y_j$, $D_{ij}\leq d_G^2(y_i,y_j)$ for all $1\leq i,j\leq N$.
+
+    This gives \begin{align*}
+        \sum_{i,j=1}^N D_{ij}-\underbrace{\sum_{i,j=1}^N D_{ij}^G}_{\text{const}}&=\sum_{i,j=1}^N(D_{ij}-G_{ij}^G)\\
+        &=-\sum_{i,j=1}^N \vert D_{ij}-D_{ij}^G\vert =-\Vert D-D^G\Vert_1 \qedhere
+    \end{align*}
+
+\end{proof}
+
+\begin{corollary}\label{cor:2.18}\marginnote{Note that we are optimizing over distance matrices, not euclidean distance matrices!}
+    Let $[Y,E]$ be a connected graph with weights $d_W$. Then $D^G$ is the unique solution of 
+    \[\max_{D\in \DM}\sum_{i,j=1}^N D_{ij}\]
+    s.t. $D_{ij}=d_W^2(y_i,y_j)$ if $(y_i,y_j)\in E$.
+\end{corollary}
+
+
+\begin{corollary}
+    Let $[Y,E]$ be a connected graph with weights $d_W$. Then
+    \begin{enumerate}
+        \item If $D^G\in\EDM$, then $D^G$ is the unique solution of the MVU problem (\ref{eq:2.1})
+        \item The problem from definition \ref{def:2.16} or (\ref{eq:2.1}) is equivalent to 
+            \[\min_{D\in \EDM}\Vert D-D^G\Vert_1\] s.t. $D_{ij}=d_E^2(y_i,y_j)$ if $(y_i,y_j)\in E$. 
+    \end{enumerate}
+\end{corollary}
+
+Therefore MVU can be considered as a regularized shortest path problem.
+
+\begin{remark}
+    Isomap can be seen to use the best $\EDM$ Approximation to $D^G$ in the sense of 
+    \[\min_{D\in \EDM}\Vert H(D-D^F)H\Vert_F.\] We saw in the exercises that this relates to cutting of eigenvalues!    
+\end{remark}
+
+We denote for a set $S$ by $\R^S$ the set of real valued functions on $S$. The restriction of a function 
+$f\in \R^S$ to a subset $\tilde{S}$ of $S$ is denoted by $f\vert_{\tilde{S}}$.
+
+\begin{lemma}\label{lem:2.20}
+    Let $S$ be a set, $\tilde{S}\subset S$,$C\subseteq\R^{\tilde{S}}$, $f\in\R^S$ and $\tilde{f}\in\R^{\tilde{S}}$. Let $\Vert \cdot\Vert$ be a 
+    norm on $\R^{\tilde{S}}$ and $c,\epsilon\geq 0$. If \begin{equation}
+        \Vert \tilde{f}-f\vert_{\tilde{S}}\Vert \leq c\epsilon
+    \label{eq:2.4}\end{equation} and  \begin{equation}
+        (1-\epsilon)f\vert_{\tilde{S}}\in C\label{eq:2.5}
+    \end{equation},
+    then 
+    \[\Vert \hat{f}-f\vert_{\tilde{S}}\Vert \leq (2c+\Vert \tilde{f}\Vert)\epsilon\]
+    for all $\hat{f\in\argmin_{\bar{f}\in C}}\Vert\bar{f}-\tilde{f}\Vert $
+\end{lemma}
+
+
+\begin{proof}
+\begin{align*}
+    \Vert \hat{f}-f\vert_{\tilde{S}}\Vert&\leq \Vert \hat{f}-\tilde{f}\Vert+\Vert\tilde{f}-f\vert_{\tilde{S}}\Vert\\
+    &\stackrel{(\ref{eq:2.4})}{=} ... 
+\end{align*}    
+\end{proof}
+
+
+\begin{theorem}\label{thm:2.21}
+    Let $[Y,E]$ be a connected graph, $Y\subset M$, where $M$ is a convex and compact manifold. For $D_G=[d_G^2(y_i,y_j)]_{i,j=1}^N$.
+    We assume it holds that it holds for some $\epsilon>0$ that 
+    \[(1-\epsilon)d_M^2(y_i,y_j)\leq d_G^2(y_i,y_j)\leq (1+\epsilon)d_M^2(y_i,y_j)\]
+    Then the solution $D$ of the MVU problem from definition \ref{def:2.16} satisfies 
+    \[\Vert D-D_M\Vert_1 \leq 3\Vert D_M\Vert_1\epsilon\leq 3(N\cdot\text{diam}(M))^2\epsilon\]
+    where diam$(M)=\sup_{x,y\in M}d_M(x,y)$.
+\end{theorem}
+
+\begin{proof}
+    Let $S=M\times M$, $\tilde{S}=Y\times Y$, $C=\{\hat{f}\in\R^{\tilde{S}}\mid [\hat{f}(y_i,y_j)]_{i,j=1}^N\in \EDM\}$
+    $f(y,z)=d_M^2(y,z)$, $\tilde{f}(y_i,y_j)=d_G^2(y_i,y_j)$, $\Vert x\Vert = \Vert x(y_i,y_j)_{i.j=1}^N\Vert_1$, $c=\Vert D^M\Vert_1$.
+
+    Condition 1 of \ref{lem:2.20} \begin{align*}
+        \Vert \tilde{f}-f\vert_{\tilde{S}}\Vert&=\Vert D^G-D^M\Vert_1\\
+        &\leq \sum_{i,j=1}^N \epsilon d_M^2(y_i,y_j)\\
+        &=\epsilon \Vert D_M\Vert_1=\epsilon c
+    \end{align*}
+Condition 2: We observe $d_M\in \EDM$. Since $\EDM$ is a cone, it follows that $(1-\epsilon)D_M\in\EDM$, so (\ref{eq:2.5}) holds in 
+lemma \ref{lem:2.20}. This implies 
+\[\Vert \tilde{f}-f\vert_{\tilde{S}}\Vert\leq (2c+\Vert f\Vert_{\tilde{S}})\epsilon=3\Vert D_M\Vert_1\epsilon\]
+Therefore $\Vert DD_M\Vert_1\leq 3\Vert D_M\Vert_1 \epsilon$.
+
+Additionally $\Vert D_M\Vert_1=\sum_{i,j=1}^N d_M^2(y_i,y_j)\leq N^2 \max_{1\leq i,j\leq N} d_M^2(_i,y_j)\leq (N\text{diam M})^2$ 
+\end{proof}
+
+\beginlecture{20}{27.06.24}
+
+\section{Spectral clustering}
+
+CLustering $\triangleq $ automatically finding groups in unlabeled data.
+
+Let $[Y,E]$ be an undirected graph with \dhighlight{weight adjacency matrix} $w=[w_{jk}]_{j,k=1}^N$.
+In particular: if $(y_i,y_j)\in E\iff w_{ij}>0$. The \dhighlight{degree of a node} $y_j\in Y$ is $d_j=\sum_{k=1}^N w_{jk}$ \marginnote{If $w$ is just the adjacency matrix, this coincides with the original definition of the degree of a node: the number of adjacent nodes}
+and the degree matrix is given by $D=\text{diag}(d_1,\dots,d_N)$. Often we consider 
+\[w_{jk}=\exp\left(\frac{-\Vert y_j-y_k\Vert_2^2}{2\sigma^2}\right)\]
+With that we define the \dhighlight{graph Laplacian} 
+\[L=D-W\]
+
+\begin{theorem}\label{thm:2.22}
+    The matrix $L=D-W$ satisfies the following properties
+    \begin{enumerate}
+        \item For any $f\in\R^n$ it holds \[f^T L f = \frac{1}{2}\sum_{j,k=1}^N w_{jk}(f_j-f_k)^2\]
+        \item $L$ is spsd 
+        \item The smallest eigenvalue of $L$ is $0$, the corresponding eigenvector is the vector of ones $1$.
+        \item $L$ has $N$ nonnegative, real-valued eigenvalues $0\leq\lambda_1\leq \dots\leq \lambda_N$.
+    \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+
+    1.:
+    \begin{align*}
+        f^T L f = f^T D f - f^TWf &= \sum_{j=1}^N d_j f_j^2 - \sum_{j,k=1}^N f_j f_k w_{jk}\\
+        &=\frac{1}{2} \left(\sum_{k=1}^N \underbrace{d_j}_{=\sum_{k} w_{jk}} f_j^2-2\sum_{j,k=1}^N f_j f_k w_{jk}+ \sum_{j=1}^N d_k f_k^2 \right)\\
+        &=\frac{1}{2}\sum_{j,k=1}^N w_{jk}(f_j-f_k)^2
+    \end{align*}
+    2.: $D,W$ are symmetric, so is $L$. psd follows from 1., since $w\geq 0$
+
+    3.: psd $\implies$ nonnegative eigenvalues. The fact that $0$ is an eigenvalue follows from the definition of $D$ via $W$
+    
+    4.: follows from 1. - 3..
+\end{proof}
+
+\begin{theorem}\label{thm:2.23}\marginnote{This makes sense, since eigenfunctions for the eigenvalue $0$ of the Laplace-Beltrami operator are constant functions, in the sense of constant on each connected component}
+    Let $[Y,E]$ be an undirected graph with nonnegative weights. Then the multiplicity $k$ of 
+    the eigenvalue $0$ of $L$ gives the number of connected components $A_1,\dots,A_k$ in the graph.
+    The eigenspace of the eigenvalue $0$ is spanned by the indicator vector $1_{A_1},\dots,1_{A_k}$
+    of these components.
+\end{theorem}
+
+\begin{proof}
+    For $k=1$, assume $f$ is eigenvector for $\lambda=0$. So 
+    \[0=f^T L f = \sum_{j,k=1}^N \underbrace{\underbrace{w_{jk}}_{\geq 0}\underbrace{(f_k-f_k)^2}_{\geq 0}}_{\stackrel{!}{=}0}\]
+    by $w_{jk}>0\implies f_{j}=f_k\implies f$ is constant for all nodes can be connected by a path in $[Y,E]$.
+    
+    Since all nodes of a connected component can be connected b a path, $f$ is constant on the component. 
+    So for one connected component $1_{A_1}$ is an eigenvector for $\lambda=0$, which is 
+    the indicator function of $A_1$.
+
+    $k>1$:\marginnote{Here we only used the distinction $w_{ij}>0$, which means for this purpose it would be fine to just use the adjacency matrix!}
+    \[L=\begin{bmatrix}
+        L_1 & &&\\
+        & L_2 &&\\
+        &&\ddots &\\
+        &&&L_N
+    \end{bmatrix}\]
+
+    Wlog the nodes are ordered according to the component. So L is of block-diagonal form.
+
+    For a block diagonal matrix, the spectrum is given by the 
+    union of the spectra of the blocks. The eigenvectors of $L$ are those of the blocks 
+    filled with zeros. Each $L_i$ is a graph laplacian (GL), so the argument for $k=1$ carries over.
+    Together, $L$ has eigenvalue $0$ with multiplicity $k$ and the indicator functions are eigenvectors. 
+
+\end{proof}
+%TODO: FIX
+\begin{algorithm}[H] 
+    \caption{Spectral clustering}\label{alg:spec_clust}
+ \textbf{Input:}  $L,k$\marginnote{We can determine $k$, but if we can also set $k$, if our graph is connected}\\
+ \textbf{Output:} Clusters $A_1,\dots,A_k$
+ \begin{algorithmic}
+    \State Compute $U_k=EVD(L,k)$
+    \For $i=1\dots N$
+        \State $x_j$ $j$th component of $U$ in $\R^k$
+    \EndFor
+    \State Cluster the points $\{x_i\}_i$ with $k$-means into clusters $c_1,\dots c_k$
+    \State return $(A_i)_{i=1}^k$ with $A_i=\{j\mid x_j\in c_i\}$
+ \end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[H] % TODO: FIX BOTH
+    \caption{Kmeans}\label{alg:k_means}
+ \textbf{Input:}  $X,k$\\
+ \textbf{Output:} $k$ clusters that segment the data
+ \begin{algorithmic}
+    \State Pick randomly $k$ points $x_j$ as cluster centers
+    \While {not converged}
+        \State for each $x_j$ determine the closest cluster center $x_j$ and assign it to it 
+        \State for each cluster, update the cluster center to be the mean of the cluster
+    \EndWhile
+    \State Cluster the points $\{x_i\}_i$ with $k$-means into clusters $c_1,\dots c_k$
+    \State return $(A_i)_{i=1}^k$ with $A_i=\{j\mid x_j\in c_i\}$
+    \State while cluster assignments do choose???
+ \end{algorithmic}
+\end{algorithm}
+
+Consider now \highlight{random walks on graphs}, stochastic process that 
+randomly jumps from node to node.
+
+\dhighlight{Transition probability} $p_{jk}$ pf jumping in one step from 
+$y_j$ to $y_k$
+\[p_{jk}=\frac{w_{jk}}{d_j}\]
+
+The \dhighlight{transition matrix} $P=[p_{jk}]_{j,k=1}^N$ of the random walk is 
+\[P=D^{-1}W.\]
+
+Let $[Y,E]$ be connected amd non-bipartite.\marginnote{A graph is bipartite if $\exists U\cup V=Y$, $U\cap V=\emptyset$ with $(x,y)\in E\implies x\in U,y\in V$ or vice versa}
+
+The corresponding random walk always processes a unique stationary distribution $\pi=[\pi_1,\dots,\pi_N]^\intercal$, since $[Y,E]$ is connected.
+\[\pi_i=\frac{d_i}{\text{Vol}(y)}\]
+where Vol$(y)=\sum_{i=1}^N d_i$.
+\marginnote{stationary means $P\pi=\pi$}
+We introduce the \dhighlight{normalized graph laplacian} or \dhighlight{random Walk laplacian}
+\[\Lrw=D^{-1}L=I-D^{-1}W=I-P\]
+\marginnote{Theorem \ref{thm:2.23} also works for $\Lrw$}
+and observe \[\Lrw u = \lambda u \iff Pu = (1-\lambda)u\iff Lu = \lambda Pu.\]
+We can also consider $\Lsym=D^{-\frac{1}{2}}L D^{-\frac{1}{2}} = I-D^{-\frac{1}{2}} W D^{-\frac{1}{2}}$,
+the \dhighlight{symmetric normalized graph Laplacian}.
+
+We now use the \dhighlight{normalized cut} (\highlight{Ncut}) as a criteria to partition the graph, s.t. 
+edges between partitions have very low weight and edges inside partitions have large weights.
+
+\begin{definition}\label{def:2.24}
+    Let $G=[Y,E,W]$ be a connected, undirected graph with symmetric, nonnegative edge weight matrix.
+    The \dhighlight{normalized cut partition} of $G$ into $k$ \dhighlight{partitions} is given by 
+    \[\min_{\stackrel{A_1,\dots,A_k\subset V:\bigcup A_j=V}{A_j\cap A_k=\emptyset}} \text{Ncut}(A_1,\dots,A_k)\]
+    where Ncut$(A_1,\dots,A_k)=\frac{1}{2}\sum_{i=1}^k \frac{W(A_i\overline{A}_i)}{\text{vol}(A_i)}$
+    and $W(A,B)=\sum_{j\in A,k\in B}w_{j,k}$, $\overline{A}_i = V\setminus A_i$.
+\end{definition}
+
+\begin{theorem}\label{thm:2.25}
+    Let $[Y,E,W]$ be a connected and non-bipartite graph. Assume that we run the random walk 
+    $(X_t)_{t\in \N}$ starting with $x_0$ in the stationary distribution $\pi$, i.e. $x_0\sim\pi$. For disjoint subsets $A,B\subset V$, we denote 
+    \[P(B\mid A)=P(X_1\in B\mid x_0\in A).\]
+    Then Ncut$(A,\overline[A])=\frac{1}{2}\left(P(\overline{A}\mid A)+P(A\mid \overline{A})\right)$
+\end{theorem}
+
+This tells us that when minimizing Ncut, we look for a cut, through the graph s.t. a random walk rarely transitions 
+from $A$ to $\overline{A}$ and vice versa.
