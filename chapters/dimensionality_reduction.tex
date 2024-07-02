@@ -887,9 +887,121 @@ edges between partitions have very low weight and edges inside partitions have l
 \begin{theorem}\label{thm:2.25}
     Let $[Y,E,W]$ be a connected and non-bipartite graph. Assume that we run the random walk 
     $(X_t)_{t\in \N}$ starting with $x_0$ in the stationary distribution $\pi$, i.e. $x_0\sim\pi$. For disjoint subsets $A,B\subset V$, we denote 
-    \[P(B\mid A)=P(X_1\in B\mid x_0\in A).\]
+    \[P(B\mid A)=P(X_1\in B\mid X_0\in A).\]
     Then Ncut$(A,\overline[A])=\frac{1}{2}\left(P(\overline{A}\mid A)+P(A\mid \overline{A})\right)$
 \end{theorem}
 
 This tells us that when minimizing Ncut, we look for a cut, through the graph s.t. a random walk rarely transitions 
 from $A$ to $\overline{A}$ and vice versa.
+
+\beginlecture{21}{02.07.24}
+
+\subsection*{Review: Markov Chain / Random Walk}
+
+Family $(X_t)_{t\in\N}$ of random variables on a countable set $X=\{x_1,\dots,x_N\}\subseteq \Omega\subseteq \R^d$
+is a \dhighlight{Markov chain}, if 
+\[\bP(X_t=x_{i_t}\mid X_{t-1}=x_{i_{t-1}},\dots,X_1=x_{i_1})=\bP(X_t=x_{i_t}\mid X_{t-1}=x_{i_{t-1}})\ \forall t\in\N,i_j\in\{1,\dots,N\}\]
+Now if $\bP(X_t=x_i\mid X_{t-1}=x_j)=p_{ji}$ is the same for all times $t$, we have a \marginnote{This is not assumed to be symmetirc}
+\dhighlight{homogen Markov Chain} and call it a \dhighlight{random walk} on the data.
+
+Further, for such a random walk, $\pi=[\pi_1,\dots,\pi_N]^\intercal$ is the stationary distribution, if 
+\begin{enumerate}
+    \item $\pi\geq 0$ and $|\pi_1|_1=1$
+    \item $\pi=P^\intercal\pi$, i.e. $\pi_i=\sum_{j=1}^NP_{ji}\pi_j$
+\end{enumerate}
+As said, we collect the $p_{ji}$ in the \dhighlight{probability transition matrix}
+\[P\coloneqq [p_{ji}]_{j,i=1}^N\]
+
+\begin{proof}[Proof of theorem \ref{thm:2.25}]
+    \begin{align*}
+        P(x_0\in A\mid x_1\in B)&=\sum_{j\in A,k\in B} P(X_0=j,X_1=k)=\sum_{j\in A,k\in B}\pi_{j}p_{jk}\\
+        &=\sum_{j\in A,k\in B} \frac{d_j}{\text{Vol}(Y)}\frac{w_{jk}}{d_j}=\sum_{j\in A, k\in B} w_{jk}
+    \end{align*}
+    The stationary distribution of the random walk can be seen to be 
+    \[\pi_i=\pi(x_i)=\frac{d(x_i)}{\text{Vol}(Y)}=\frac{d(x_i)}{\sum_{i=1}^N d(X_i)}\]
+    With this, we obtain 
+    \begin{align*}
+        \bP(X_1\in B\mid X_0\in A)&=\frac{\bP(X_0\in A,X_1\in B)}{\bP(X_0\in A)}\\
+        &=\left(\frac{1}{\text{Vol}(Y)}\sum_{j\in A,k\in B}w_{jk}\right)\left(\frac{\text{Vol}(A)}{\text{Vol}(Y)}\right)^{-1}\\
+        &=\sum_{j\in A,k\in B}\frac{w_{jk}}{\text{Vol}(A)}=\frac{W(A,B)}{\text{Vol}(A)}
+    \end{align*}
+    The result follows from the definition of Ncut.
+\end{proof}
+
+\section{Diffusion Maps}
+
+\dhighlight{Idea:} consider longer paths, apply $P$ a couple of times. probability of transition from $y_i$ to $y_j$
+in $t$ steps is $[P^t]_{ij}$.
+
+Further the weights in $P^t$ specify local geometry, we can capture with $P^t$ geometric features
+at different scales. In other words, the markov chain shows fast and slow directions of propagation.
+
+
+\begin{definition}\label{def:2.26}
+    Let $P$ be the transition matrix of a random walk on a graph. The \dhighlight{diffusion distance} is defined as 
+    \[\dd_t^2(y_i,y_j)=\sum_{k=1}^N \left\vert [P^t]_{ik}-[P^t]_{jk}\right\vert^2\frac{1}{\pi(y_k)}\]
+\end{definition}
+
+One interpretation of $dd_t$ is as the weighted $L_2$ distance between the two probability distributions $([P^t]_{ik})_{k=1}^N$ and $([P^t]_{jk})_{k=1}^N$.
+
+For increasing $t$ the distributions become wider and flatter, therefore more overlap and the points become closer in the 
+$\dd_t$ sense, with .... % TODO
+
+
+Multiplying $\dd_t$ gives:\marginnote{While $P$ is not always symmetric, $\dd$ is!}
+\begin{align*}
+    \dd_t^2(y_i,y_j)&= \sum_{k=1}^N[P^t]_{ik}^2\frac{1}{\pi_k}-2\sum_{k=1}^N \left([P^t]_{ik}[P^t]_{jk}\right)\frac{1}{\pi_k}+\sum_{k=1}^N [P^t]_{jk}^2\frac{1}{\pi_k}\\
+    &=\langle y_i,y_i\rangle_{\P^t\pi}-2\langle y_i,y_j\rangle_{P^t\pi}+\langle y_j,y_j\rangle_{P^t\pi}\\
+    &=\sum_{k=1}^N\left([P^t]_{ik}-[P^t]_{jk}\right)\frac{1}{\pi_k}
+\end{align*}
+
+This is a weighted scalar product of a feature map that involves probabilities of sums from a point $y_i$ to any other $y_k$ in $t$ steps.
+
+Consider the weighted graph $[Y,E]$, where the weights are given by a kernel 
+$k(x,y)$\marginnote{The original choice is the gaussian kernel!}
+that is non-negative. 
+
+We define $d(y_j)\coloneqq \sum_{k=1}^N k(y_j,y_k)$ and observe 
+\[p(y_j,y_k)=\frac{k(y_j,y_k)}{d(y_i)}.\]
+Then $p(y_j,y_k)\geq 0, P$ is not symmetric, but $\sum_{k=1}^N p(y_j,y_k)=1$. Now 
+\begin{align*}
+    (\star\star)\ \tilde{p}(y_j,y_k)=p(y_i,y_k)\sqrt{\frac{d(y_j)}{d(y_k)}}=\frac{k(y_j,y_k)}{\sqrt{d(y_i)}\sqrt{d(y_k)}}
+\end{align*}
+
+$\tilde{p}$ is symmetric and we can obtain a spectral decomposition of it:
+\[\tilde{p}(y_j,y_k)=\sum_{i=1}^n\lambda_i\phi_i(y_j)\phi_i(y_k)\]
+and from spectral graph theory one can obtain
+\[\lambda_0=1\geq \lambda_1\geq \lambda_{N_1}.\]
+Furthermore $\phi_0=\sqrt{\pi}$, where $\pi(y_i)=\frac{d(y_i)}{\sum_{j=1}^N d(y_j)}$
+is the stationary distribution of the associated random walk.
+
+With $(\star\star)$ we get:
+\begin{align*}
+    p(y_j,y_k)=\sum_{k=1}^N\lambda_i\psi_i(y_j)\chi_i(y_k)
+\end{align*}
+where 
+\[\phi_i(y_j)=\frac{\phi_i(y_j)}{\pi(y_j)}\]
+and 
+\[\chi_i(y_k)=\phi_i(y_k)\sqrt{\pi(y_k)}.\]
+In particular $\psi_0=1$. For repeated applications of $p$, we obtain, due to the orthogonality of the eigendecomposition:
+\[(\star)\ P_t(y_j,y_k)=\sum_{i=0}^{N-1}\lambda_i^t\underbrace{\psi_i(y_j)}_{\text{Coefficient}}\chi_i(y_k)\]
+
+\begin{definition}\label{def:2.27}
+    We define the \dhighlight{family of diffusion maps} $\{\Psi_t^s\}_{t\in\N,1\leq s\leq N_1}$ by 
+    \[\Psi_t^s(y_k)=\begin{bmatrix}
+        \lambda_1^t\psi_1(y_k)\\
+        \lambda_2^t\psi_2(y_k)\\
+        \vdots\\
+        \lambda_s^t\psi_s(y_k)
+    \end{bmatrix}\]
+    where $\lambda_i,\psi_i$ are from $(\star)$. We also set $\Psi_t=\Psi_t^{N-1}$. Each component 
+    $\lambda_i^t\psi_i$ is called a \dhighlight{diffusion coordinate}.
+\end{definition}
+
+\begin{aremark}
+    For higher $t$ we need less eigenfunctions for a good representation, since $\lambda_i\leq 1$!
+    There is a coarsening effect for larger $t$.
+\end{aremark}
+
+
+
