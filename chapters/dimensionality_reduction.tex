@@ -986,7 +986,7 @@ and
 In particular $\psi_0=1$. For repeated applications of $p$, we obtain, due to the orthogonality of the eigendecomposition:
 \[(\star)\ P_t(y_j,y_k)=\sum_{i=0}^{N-1}\lambda_i^t\underbrace{\psi_i(y_j)}_{\text{Coefficient}}\chi_i(y_k)\]
 
-\begin{definition}\label{def:2.27}
+\begin{definition}\label{def:2.27a}
     We define the \dhighlight{family of diffusion maps} $\{\Psi_t^s\}_{t\in\N,1\leq s\leq N_1}$ by 
     \[\Psi_t^s(y_k)=\begin{bmatrix}
         \lambda_1^t\psi_1(y_k)\\
@@ -1001,6 +1001,110 @@ In particular $\psi_0=1$. For repeated applications of $p$, we obtain, due to th
 \begin{aremark}
     For higher $t$ we need less eigenfunctions for a good representation, since $\lambda_i\leq 1$!
     There is a coarsening effect for larger $t$.
+\end{aremark}
+
+\beginlecture{22}{04.07.24}
+
+\begin{equation}\label{eq:diffmap}
+    P_t(y_k,y_k)=\sum_{i=0}^{N-1}\lambda_i^t\psi_i(y_j)\chi_i(y_k)
+\end{equation}
+
+\begin{*definition}\label{def:2.27b}\marginnote{Here again $\psi_i$ are vectors, $\psi_i(y_k)=(\psi_i)_k$ is the $k$th entry}
+    Let $P$ be the transition map of a random walk on a graph $[V,E]$ and $\{\psi_i\}_{i=0}^{N-1}$ be the 
+    eigenvector of $P$ with eigenvalues $1=\lambda_0\geq\lambda_1\geq \dots\geq\lambda_{N-1}$. The $\psi$ are orthonormal w.r.t.
+    \[\langle \psi_i,\psi_j\rangle_{\pi}= \sum_{k=1}^N\psi_i(y_k)\psi_j(y_k)\pi(y_k)\]
+    \dots
+\end{*definition}
+
+\begin{theorem}\label{thm:2.28}
+    The diffusion distance $\dd_t$ is equal to th euclidean distance in the diffusion map space:
+    \begin{align*}
+        \dd_t^2(y_j,y_l)&=\Vert \Psi_t(y_j)-\Psi_t(y_l)\Vert^2\\
+        &=\sum_{i=1}^{N-1}\lambda_i^{2t}\left(\psi_i(y_j)-\psi_i(y_l)\right)^2
+    \end{align*}    
+\end{theorem}
+
+\begin{proof}
+    Inserting \ref{eq:diffmap} into $\dd_t$ gives 
+    \begin{align*}
+        \dd_t^2(y_j,y_l)&=\sum_{k=1}^{N}\underbrace{\left(\sum_{i=1}^{N-1}\lambda_i^t(\psi_i(y_j)-\psi_i(y_l))\chi_i(y_l)\right)^2}_{\text{independent of }k}\frac{1}{\pi(y_k)}
+    \end{align*}
+    Multiplying out and observe that 
+    \[\langle\chi_i,\chi_k\rangle_{\frac{1}{\pi}}=\delta_{jk}\]
+    gives 
+    \begin{align*}
+        \dd_t^2(y_j,y_l)&=\sum_{k=1}^{N-1}\lambda_i^{2t}\left(\psi_i(y_j)-\psi_i(y_l)\right)^2\qedhere
+    \end{align*}
+\end{proof}
+
+Besides the underlying manifold view, one cane see the data as 
+samples from the \dhighlight{equilibrium distribution} of stochastic dynamical systems.
+\begin{enumerate}
+    \item Manifold view $\to $ recover the manifold structure regardless of the data distribution
+    \item Stochastic dynamical system view $\to$ density of points is the quantity of interest
+\end{enumerate}
+
+To generalize diffusion maps one can add a density normalization step:
+1.: with
+\[q_k(y_i)=\sum_{l=1}^{N}k(y_i,y_l)\]
+leads to the density normalization
+\[K^{(\alpha)}(x,y)=\frac{K(x,y)}{q_k^{\alpha}(x)q_k^{\alpha}(y)}.\]
+2.: set $d^{(\alpha)}(y_i)=\sum_{l=1}^N k^{(\alpha)}(y_i,y_l)$
+\[P^{(\alpha)}(y_i,y_j)=\frac{K^{(\alpha)}(x,y)}{d^{(\alpha)}(y_i)}\]
+
+\begin{remark}\marginnote{$\alpha=1$ is a reasonable choice, it captures the strucutre of the manifold}
+    One can show that $\alpha$ corresponds to a specific type of flow field on the submanifold the data lies on:
+    \begin{itemize}
+        \item $\alpha=0$: flow field follows the normalized graph laplacian for gaussian kernel 
+        \item $\alpha=1$: leads to a finite sample approximation of Brownian motion random process, flow fields follows the Laplace (-Beltrami) operator on the manifold 
+        \item $\alpha=\frac{1}{2}$: any $\alpha$ between $0$ and $1$ introduces a drift term in addition to the Brownian motion. $\alpha=\frac{1}{2}$ reflects the 
+              Folker-Plank dynamics of the random walk   
+    \end{itemize}
+\end{remark}
+
+\begin{aremark}
+    A bit more detail and information can be found in his script, since we are running low on time!    
+\end{aremark}
+
+\section{t-Stochastic Neighborhood Embedding (t-SNE)}
+
+\begin{itemize}
+    \item two $d$ curved manifold
+    \item ten $d$ curved manifold 
+\end{itemize}
+
+It is problematic to use pairwise distances in two dimensions to approximate pairwise distances in ten dimensions!
+
+\begin{itemize}
+    \item in ten dimensions it is possible to have $11$ points that are mutually equidistant 
+    \item the volume of a sphere centered on a point $y$ scales as $r^d$
+\end{itemize}
+
+t-SNE minimizes the (KL) divergence between two distributions. One measures pairwise similarities in the input 
+objects, the other in the embedding of the corresponding points. 
+
+Given $\{y_i\}_{i=1}^N$ and a distance function $d(y_i,y_j)$, commonly euclidean distance. We use 
+\[p(y_j\mid y_i)=\frac{\exp(\frac{-d(y_i,y_j)^2}{2\sigma_i^2})}{\sum_{k\neq i}}\exp(-d(y_i,y_k)^2/(2\sigma_i^2))\]
+$y_j$ would get picked as a neighbor of $y_i$ in proportion to a Gaussian probability density with variance $\sigma_i$
+
+Further, $p(y_i\mid y_i)=0$. To obtain symmetry we use define $p_{ij}=\frac{p(y_j\mid y_i)+p(y_i\mid y_j)}{2N}$.
+
+The probability in the embedding space is modelled by a Student-t distribution (which will be a Cauchy distribution).
+\[q_{ij}=\frac{(1+\Vert x_i-x_j\Vert^2)^{-1}}{\sum_{k}\sum_{k\neq l}(1+\Vert x_i-x_j\Vert^2)^{-1}}\]
+
+t-SNE computes $\{x_1,\dots,x_n\}$ that minimize the \dhighlight{Kullback-Leibner-divergence}\footnote{or \dhighlight{relative entropy}} between distributions $p$ for $Y$ and $q$ for $X$.
+\[C=\KL(P\mid Q)=\sum_{i}\sum_{j}p_{ij}\log\frac{p_{ij}}{q_{ij}}\]
+the gradient of the KL-divergence between $p$ and $q$ is 
+\begin{align*}
+    \frac{\partial C}{\partial x_i}=4\sum_{j}(p_{ij}-q_{ij}) (x_i-x_j)(1+\Vert x_i-x_j\Vert^2)^{-1}
+\end{align*}
+
+\begin{aremark}
+    Interpreting t-SNE is hard, distances between clusters might not be meaningful! We will use quadtrees to organize the data. We also use the Barnes-Hut approximation.
+\end{aremark}
+
+\begin{aremark}
+    U-map and t-SNE are both used in practice!
 \end{aremark}
 
 
