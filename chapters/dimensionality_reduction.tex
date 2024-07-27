@@ -1107,5 +1107,313 @@ the gradient of the KL-divergence between $p$ and $q$ is
     U-map and t-SNE are both used in practice!
 \end{aremark}
 
+\beginlecture{23}{09.07.24}
+
+I was ill, no notes. Content: Finishing t-SNE and start of 
+
+\section{Autoencoders}
+
+
+\beginlecture{24}{11.07.24}
+
+\subsection{Variational Autoencoder}
+
+In \dhighlight{VAE} we use a probabilistic model $p(Y\mid X=x)$. \marginnote{$X,Y$ are random variables, $\overline{X},\overline{Y}$ are in the dataset}
+and aim to approximate it. We generate a generative decoder by \begin{itemize}
+    \item  modelling the latent space distribution
+    \item approximating the conditionals $p(Y\mid X)$ and $p(X\mid Y)$
+\end{itemize}
+
+In the latent space we assume 
+\[P(X)=\mathcal{N}(0,I).\]
+The decoder density is modelled as \marginnote{He does not really care about $X$ vs $x$ \dots}
+\[P(Y\mid X=x)=\mathcal{N}(f(x),\sigma^2I)\]
+where $f$ is a \dhighlight{deep neural network}.
+\[f:\R^q\to\R^d\]
+As the optimization criteria we use maximum likelihood of obtaining $\overline{Y}=\{y_1,\dots,y_N\}$
+\begin{align*}
+    \log(P(\overline{Y}))&=\log(P(Y=\overline{Y}))\\
+    &\stackrel{\text{$y_i$ independent realizations of $Y$}}{=}\log\left(\prod_{i=1}^N p(Y=y_i)\right)\\
+    &=\sum_{i=1}^N\log\left(p(Y=y_i)\right)\\
+    &=\sum_{i=1}^N\log\left(\underbrace{\int_{\R^q} p(y_i\mid X=x)p(x)dx}_{=\bE_p\left(P(y\mid X=x)\right)}\right)
+\end{align*}
+
+To compute the integral we could use a Monte Carlo estimator, bu that is slow to converge.
+
+\begin{enumerate}
+    \item Compute $x_j\sim P(x)$, $\frac{1}{N}\sum_{j=1}^N\sum_{i=1}^N \log p(y_i\mid X=X_j)$
+\end{enumerate}
+
+We can be seen to use \dhighlight{important sampling}, where the $x_i$ are drawn, where $P(y_i\mid X=X_j)$ is large.\marginnote{I think it should be $P(y_j\mid X=x_j)$ here \dots}
+We construct $\nu(X\mid Y=y)$ to be able to sample those $x$ that are likely to produce $y$.
+
+So instead we compute a sampling estimate of 
+\[\int_{\R^q}P(Y\mid X=x)\nu(x\mid Y=y)dx=\bE_\nu(P(Y\mid X=x))\]
+Using the Kullback-Leibner divergence between $\nu$ and the true probability distribution $p(x\mid Y=y)$
+\begin{align*}
+    K_{\nu,P}=\text{KL}(\nu(x\mid Y=y)\Vert P(x\mid Y=y))=\mathbb{E}_\nu\left(\log(\nu(x\mid Y=y))-\log(P(x\mid Y=y))\right)
+\end{align*}
+
+Using Bayes  theorem we see 
+\begin{align*}
+    P(x\mid Y=y)=\frac{P(y\mid X=x)P(X=x)}{P(Y=y)}
+\end{align*}
+
+\begin{align*}
+    K_{\nu,P}&=\mathbb{E}_\nu\left(\log(\nu(x\mid Y=y))-\log\left(\frac{P(y\mid X=x)P(X=x)}{P(Y=y)}\right)\right)\\
+    &=\mathbb{E}_\nu\left(\log(\nu(x\mid Y=y))-\log\left(P(y\mid X=x)P(X=x)\right)\right)+\underbrace{\log\left(P(Y=y)\right)}_{\text{Constant}}\\
+\end{align*}
+
+We can rearrange this:
+\begin{align*}
+    \underbrace{\log\left(P(Y=y)\right)}_{\text{log-evidence of model}}-\underbrace{K_{\nu,P}}_{\geq 0}=\underbrace{\mathbb{E}_{\nu}\left(\log(P(y\mid X=x))\right)-\text{KL}\left(\nu(x\mid Y=y)\Vert p(X=x)\right)}_{\text{Evidence lower bound (ElBo)}}
+\end{align*}
+
+This was the goal to optimize.
+
+If $\nu(x\mid Y=y)$ is a good approximation for of $p(x\mid Y=y)$, $K_{\nu,P}$ will be small.
+
+If we are maximizing the sum of the ElBos for each $y_i$ we are maximizing $\log(P(\overline{Y}))$.
+
+Maximizing ElBo achieves
+\begin{itemize}
+    \item maximizing the log-likelihood of $\overline{Y}$ and therefore the generative model $p(Y\mid X)$ becomes better 
+    \item minimizing the KL-divergence between $\nu$ and the posterior $P$ and therefore the so called \dhighlight{inference model} $\nu$ becomes better
+\end{itemize}
+
+\begin{align*}
+    \nu(x\mid Y=y)\sim\mathcal{N}(g_1(y),\exp(g_2(y))^\intercal I)
+\end{align*}
+\marginnote{Here $\exp(g_2(y))$ is meant componentwise which than is taken as the diagonal?}
+with $g_1,g_2:\R^d\to\R^q$ two DNNs encoding the mean and variance of $\nu$,
+where $\exp(g_2(y))$ is meant componentwise (on the diagonal). Usually $g_1,g_2$ have the same network architecture.
+
+\begin{align*}
+    (\tilde{f},\tilde{g_1},\tilde{g_2})=\argmin_{f,g_1,g_2}\sum_{i=1}^N \underbrace{\mathbb{E}_\nu\left[\log(P(y_i\mid X=x))\right]-\text{KL}\left(\nu(x\mid Y=y_i)\Vert P(X=x)\right)}_{L_i(f,g_1,g_2)}
+\end{align*}
+
+\begin{remark}
+    The $\sigma$ from $P(Y\mid X=x)\sim\mathcal{N}(f(x),\sigma^2I)$ can be interpreted as a regularization parameter.
+    It changes $P(y\mid X=x)$ without affecting the $\text{KL}(\nu\Vert p(X))$, 
+    it balances the two ElBo terms. $\sigma$ reflects how accurately we expect the model to reconstruct 
+    $Y$. 
+
+\end{remark}
+
+One can see \begin{align*}
+    \text{KL}(\nu(x\mid Y=y)\Vert p(X=x))&=\frac{1}{2}\left(-\sum_{i=1}^q(g_2(y))_i-q+\sum_{i=1}^q \exp(g_2(y))_i+\sum_{i=1}^q(g_1(y))_i^2\right)
+\end{align*}
+The derivative can be computed by automatic differentiation. For the first term we could 
+perform a MC-estimator, with slow convergence. Instead we draw a sample $X_i\sim\nu(X\mid Y=y_i)$ for each $y_i$ in the minibatch
+and use the \highlight{one-shot estimator} $\log(P(y_i\mid X=x))$ as an unbiased estimator. We then just average 
+over all samples in the minibatch to evaluate the loss. Essentially $\nabla_{g_1,g_2}\bE_\nu(\dots)\neq \bE_\nu(\nabla_{g_1,g_2}\dots)$.
+
+We can use the \dhighlight{reparametrization trick}:
+
+We draw $x(Y)$ according to $\nu(X\mid Y=y)$ and 
+parametrize via 
+\[x(Y)=g_1(y)+\sqrt{\exp(g_2(y))}IZ\]
+with $Z\sim\mathcal{N}(0,1)$.\marginnote{Here we decouple our drawing process from taking the derivative}
+Then \begin{align*}
+    \nabla_{g_1,g_2}\mathbb{E}_Z(\log(P(y\mid X=x))) &=\nabla_{g_1,g_2}\mathbb{E}_\nu(\log(y\mid X=g_1(y)+\sqrt{\exp(g_2(y))}IZ))\\
+    &=\bE_Z(\nabla_{g_1g_2}\log(P(y\mid X=x))) \\
+    &=\nabla_{g_1,g_2}\mathbb{E}_Z(\log(y\mid X=g_1(y)+\sqrt{\exp(g_2(y))}IZ))
+\end{align*}
+
+\beginlecture{25}{16.07.24}
+
+We define for $B\subseteq\{1,\dots,N\}$ the \dhighlight{minibatch loss} on $B$
+\[L_B(f,g_1,g_2)=\frac{1}{|B|}\sum_{i=1}^{|B|}L_{B_i}(f,g_1,g_2)\]
+
+\begin{algorithm}[H] % TODO: FIX BOTH
+    \caption{Stochastic minibatch gradient descent}\label{alg:sbgd}
+ \textbf{Input:}  $Y$, learning rate $\eta>0$, minibatch size $\kappa\leq N$, number of epochs $S\in \N$\\
+ \textbf{Output:} Updated weights and biases
+ \begin{algorithmic}
+    \State Initialize all weights $W$ and biases $b$
+    \For {$s=1,\dots,S$}
+        \State subdivide $\{1,\dots,N\}$ into $\lceil \frac{N}{\kappa}\rceil$ disjoint subsets $B_i$
+        \For {$B_{1},\dots,B_{\lceil \frac{N}{\kappa}\rceil}$}
+        \State calculate $f,g_1,g_2$ for all $i\in B$\marginnote{forward propagation}
+        \State calculate $\nabla_{W,b} L_B(f,g_1,g_2)$\marginnote{w.r.t. all weights and biases}
+        \State update each weight $w_{i,j}^{(l)}\leftarrow w_{i,j}^{(l)}-\eta\frac{\partial}{\partial w_{i,j}^{(l)}}L_B(f,g_1,g_2)$
+        \State update each bias $b_{j}^{(l)}\leftarrow b_{j}^{(l)}-\eta\frac{\partial}{\partial b_{j}^{(l)}}L_B(f,g_1,g_2)$
+        \EndFor
+    \EndFor
+ \end{algorithmic}
+\end{algorithm}
+
+One can also 
+\begin{itemize}
+    \item use momentum or Nestorov update
+    \item adapt step size / learning rate
+    \item use ADAM adaptive moment estimation
+\end{itemize}
+
+\begin{aremark}
+    Definition, theorems, connections! Also kernels in both topics, there is a connection! Can you tell me something about? 30min +x 
+
+    Bring student ID and government ID. Questions are not always precise. Don't talk to long about one topic. How quick do we come to the point. He won't ask questions on the exercises, but they can help.
+
+\end{aremark}
+
+\section{Generative Diffusion Models}
+
+\begin{definition}\label{def:.29}
+    A time-discrete \dhighlight{forward diffusion process} starting at a data point $y^{(i)}\in\R^d$, which 
+    has been drawn according to some unknown distribution $p$, is defined by 
+    \[y^{(i+1)}=\sqrt{1-\beta_{i+1}}+\sqrt{\beta_{i+1}}+\epsilon\ (\star)\]
+    for each $i\in W$. Here $0<\beta_i<1$ is called the noise level and $\epsilon\sim\mathcal{N}(0,I)$, $\epsilon\in\R^d$.
+\end{definition}
+For $i\to \infty$, the $y^{i+1}$ become completely random, normally distributed vectors. Consider the stochastic differential equations (SDE) in the 
+form of 
+\[\frac{d Y(t)}{dt}=\mu(y(t),t)+\sigma((y(t),t))\frac{dW(t)}{dt}\ (\star\star\star)\]
+with $Y,W:[0,\infty)\to\R^d$ are stochastic processes. The drift coefficient $\mu:\R^d\times [0,\infty)\to\R^d$ and 
+the diffusion coefficient $\sigma:\R^d\times [0,\infty]\to\R$. $W$ is modelled as a multidimensional Brownian Motion / Wiener process,
+where $W(\tilde{t})-W(t)$ are independent and modelled as $\mathcal{N}(0,(\tilde{t}-t)I)$.
+
+In particular, \[\frac{dY(t)}{dt}=-\frac{1}{2}\beta(t)Y(t)+\sqrt{\beta(t)}\frac{dW(t)}{dt}\ (\star\star\star\star)\]
+with $\beta(t):[0,\infty)\to\R$ noise variance. 
+
+We use for discretization the Euler-Maruyama-scheme with step size $\delta t$:
+\[Y(t+\delta_t)=Y(t)-\frac{1}{2}\beta (t)Y(t)\delta t+\sqrt{\beta(t)}\sqrt{\delta t}\epsilon \ (\star\star)\]
+Consider $(\star)$ with $y^{(i)}=Y(i\delta t)$ and $\beta_i=\beta((i+1)\delta t)\delta_t$
+\[Y((i+1)\delta t)=\sqrt{1-\beta(i\delta t)}Y(i\delta t)+\sqrt{\beta(i\delta t)}\epsilon\]
+
+Use Taylor expansion on the drift part around $\delta t=0$: 
+\begin{align*}
+    \sqrt{1-\beta(i\delta t)\delta t}=1-\frac{\beta(i\delta t)}{2}\delta t+ O((\delta t)^2)
+\end{align*}
+
+So up to a second order term in $\delta t$, $(\star\star)$ resembles $\star$.
+
+\subsection{Reversed diffusion process}
+To draw according to the data distribution, we need the reverse diffusion process $\overline{Y}$. It transforms $Y(t)$ for $t$ very large, back.
+
+Generally, it can be shown that a forward SDE $(\star\star\star)$ can be reversed in time to get the reverse time SDE. In case of 
+$(\star\star\star)$ one gets \[\frac{d\overline{Y}}{d t} = \frac{1}{2}\beta(t)(\overline{Y}(t)+\underbrace{g(\overline{Y}(t),t)}_{\text{Score function}})+\sqrt{\beta(t)}\frac{d\overline{W}(t)}{dt}\]
+for some $g:\R^d\times [0,\infty)\to\R^d$. Euler-Maruyama gives 
+\[\overline{Y}(t-\delta t)=\overline{Y}(t)-\frac{1}{2}\beta(t)(\overline{Y}(t)+g(\overline{Y}(t),t))+\sqrt{\beta(t)\delta t}\epsilon\]
+Observations: So in both directions we compute terms depending on the current iterate and a Gaussian increment.
+
+\begin{align*}
+    P^\star(y^{(i)}\mid y^{i-1})&=\mathcal{N}(\sqrt{1-\beta_i}y^{(i-1)},\beta_i I)\\
+    P^\star(y^{i-1}\mid y^{(i)},y^{(0)})&=\mathcal{N}(\tilde{m}_i,\tilde{\sigma}_iI)
+\end{align*}
+where $\tilde{m}_i,\tilde{\sigma}_i$ only depend on $y^{(i)},y^{0}$ and $\beta_j,1\leq j\leq i$.
+
+But $y^{(0)}$ is not known when reversing the process for new images, so we aim to approximate this by 
+\begin{align*}
+    P(y^{(i-1)}\mid y^{(i)})=\mathcal{N}(m_i,\sigma_iI) 
+\end{align*}
+with $m_i,\sigma_i$ can be learned or set. The noise level is typically fixed $\sigma_i=\beta_i$ and $m_i$ is the output of a 
+neural network given $y^{(i)}$, learned from training data $Y_1,\dots,Y_N$.
+
+\beginlecture{26}{18.07.24}
+
+As for VAE
+\[\mathbb{E}_{P^\star(Y(0))}[P(Y(0))]\]
+This cannot directly be computed, so we use the ElBo 
+\begin{align*}
+    \log P(Y(0))&=\log\left(\int P^\star(y(1:T)\mid y(0))\frac{P(y(0:T))}{P^\star(y(1:T)\mid y(0))}dy(1:T)\right)\\
+    y(1:T)&=(y(1),\dots,y(T))
+\end{align*}
+Now with $p(y(0:T))=\underbrace{P^\star(y(T))}_{\mathcal{N}(0,I)}\prod_{i=1}^{T}P(Y(i-1)\mid Y(i))$
+and $T$ the number of steps of the forward process, $T$ large enough. One can see 
+\begin{align*}
+\log(Y(0))&\geq \int P^\star(Y(1:T)\mid Y(0))\log(P^\star(Y(T)))\prod_{i=1}^{T}\frac{P(Y(i-1)\mid Y(i))}{P^\star(Y(i)\mid Y(i-1))}\\
+&=\mathbb{E}_{P^\star}\left[\log P^\star (Y(T))+\sum_{i=1}^T\log\frac{P(Y(i-1)\mid Y(i))}{P^\star(Y(i)\mid Y(i-1))}\right]
+\end{align*}
+
+Given training data, we can approximate this empirically 
+\begin{align*}
+    \approx \frac{1}{N}\sum_{i=1}^N\left(\log(P^\star(Y_j(T)))+\sum \log\frac{P(Y_j(i-1)\mid Y_j(i))}{P^\star(Y_j(i)\mid Y_j(i-1))}\right)
+\end{align*}
+where $P^*(Y_j(i)\mid Y_j(i-1))$ is known and wen can optain 
+\[y_j(i)\]
+by sampling from $P^\star(Y_j(i) \mid y_j(i-1))$. Therefore we can evaluate this expression for each 
+$y_j=y_j(0)$.
+
+We assume that $T$ is large enough, s.t. $P^\star(Y_j(T))\sim\mathcal{N}(0,I)$. Together, we can evaluate the expression 
+and minimize it with a SDG-type algorithm w.r.t. weights and biases of the network for $m_i$.
+
+With the learned $w_i$, we then propagate a random sample $Y(T)\sim\mathcal{N}(0,I)$ by computing the 
+$m_i$ and following the backwards process  for $i=T_1,\dots,1$ and get the new data $y(0)$ approximately
+from the image distribution.
+
+\chapter{Misc}
+
+\section{What we didn't cover}
+
+For dimensionality reduction: There is further probabilistic views on that! We can also use an embedding, which more strongly reflects our data classes.
+We might want to include this information in our dim. reduction.
+
+From the stochastic view (think PCA, we  assume linear map). But we can just think of random matrices, there is the Johnson-Lindenstrauss lemma.
+
+In view of NNs we can also talk about restricted Boltzmann machines. 
+
+For the kernel stuff: We didn't do sampling inequalities! Idea of oversampling. We can also do Wendler-Kernels\marginnote{Compactly supported kernels $\to$ sparse matrices}?
+
+\section{Review of the lecture notes}
+
+\textbf{Kernels}
+
+\begin{itemize}
+    \item Kernels, applications 
+    \item Feature map / mercer kernel view , kernels as generalizations of scalar products
+    \item Collection of properties, how do we do computations with kernels 
+    \item Riesz-Rep / Functional analysis view 
+    \item Kernels give a way to represent functions / reproducing kernel hilber spaces
+    \item Theorem 1.9 semi is missing 
+    \item Subspaces and connections to mercer kernels 
+    \item Function approximation through projection onto subspaces 
+    \item Best approximation / minimizing norm (Hilbert projection theorem)
+    \item Power function and error bounds 
+    \item Power function in terms of the kernel 
+    \item Power function and condition of kernel matrix (eigenvalues, smallest eigenvalue and power functions), relation to fill distance (balancing act)
+    \item Polynomial reproduction / cone condition, a bit technical
+    \item Seite 36: Beweisidee Taylorexpanssion wichtig
+    \item Hermite interpolation 
+    \item Connection to PDEs
+    \item cpsd $\to$ later kernel PCA (for order 1)
+    \item Loss functions (as a relaxation of interpolation)
+    \item Some loss functions
+    \item Expected and empirical risk 
+    \item Regularization (also relates to power functions and fill distances)
+    \item representer theorem and regularization operators
+    \item Greens kernel (vllt. nicht so wichtig?)
+    \item eigendecomposition and kernels $\to$ mercer kernel
+    \item Gaussian process 
+    \item SVMs (key algorithm) (connection to hinge loss?)
+    \item 1.55 distances and cpsd of order 1   
+\end{itemize}
+
+
+\textbf{dimensionality reduction}
+
+\begin{itemize}
+    \item Distances, kernels connections
+    \item Work with data PCA / MDS / SVD
+    \item Several ways to view / derive PDA 
+    \item Key thing: MDS is the same as PCA just slightly different. Similarities ... 
+    \item Theorem 2.6 important to connect scalar products to distances 
+    \item 3 different ways to compute the embedding (page 90)
+    \item Problems in higher dimensions
+    \item Graph distances, Iso map \dots 
+    \item Under certain assumptions Iso map ... is reasonable 
+    \item Parallel transport unfolding (not as important? Differential geometry)
+    \item Perturbation analysis 
+    \item Nonlinear PCA and Kernel MDS 
+    \item Maximum variance unfolding, find a kernel ..., similar to iso map, also works with graph distances
+    \item Spectral clustering, diffusion processes and random walks on graphs, cuts ...
+    \item K-means 
+    \item diffusion maps, non symmetric matric $\to$ construct symmetric matrix
+    \item diffusion distance 
+    \item density aware diffusion (only sketched)
+    \item Two steps in the diffusion map algorithm 
+    \item t-SNE(why can we compute this? quadtrees!)
+    \item Autoencoder, VAE (ElBo)
+    \item Diffusion process and SDEs 
+\end{itemize}
 
 
